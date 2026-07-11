@@ -1,0 +1,1992 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.0 effective-5.10 (swiftlang-6.0.0.9.10 clang-1600.0.26.2)
+// swift-module-flags: -target arm64-apple-ios11.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name EsewaSDK
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface
+import DeveloperToolsSupport
+@_exported import EsewaSDK
+import Foundation
+import Swift
+import SwiftUI
+import SystemConfiguration
+import UIKit
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public enum ValidationType {
+  case email
+  case password
+  case text
+  case fullName
+  case mobileNumber
+  case landline
+  case esewaId
+  case mpin
+  case mpinPassword
+  public var autocapitalizationStyle: UIKit.UITextAutocapitalizationType {
+    get
+  }
+  public var keyboardType: UIKit.UIKeyboardType {
+    get
+  }
+  public static func == (a: ValidationType, b: ValidationType) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@objc @_inheritsConvenienceInitializers open class TextFieldValidator : ObjectiveC.NSObject {
+  public typealias Validation = (field: FormTextField, validationType: ValidationType)
+  public var validationList: [TextFieldValidator.Validation]
+  public var isValidationSuccess: Swift.Bool
+  public func add(field: FormTextField, validationType: ValidationType, characterLimit: Swift.Int)
+  public func validateAll()
+  public func resetAllValidation()
+  public func validateTextField(field: FormTextField) -> (isValid: Swift.Bool, message: Swift.String)
+  public func validateMpinPassword(textField: FormTextField) -> (isValid: Swift.Bool, message: Swift.String)
+  public func validateMpin(textField: FormTextField) -> (isValid: Swift.Bool, message: Swift.String)
+  public func validateRegex(textField: FormTextField, regex: Swift.String, errorMessage: Swift.String) -> (isValid: Swift.Bool, message: Swift.String)
+  public func validateEsewaId(textfield: FormTextField) -> (isValid: Swift.Bool, message: Swift.String)
+  public func validateFullName(textField: FormTextField) -> (isValid: Swift.Bool, message: Swift.String)
+  public func validateText(textField: FormTextField) -> (isValid: Swift.Bool, message: Swift.String)
+  public func validateMobileNumber(textField: FormTextField) -> (isValid: Swift.Bool, message: Swift.String)
+  public func validateEmail(textField: FormTextField) -> (isValid: Swift.Bool, message: Swift.String)
+  public func validatePassword(textField: FormTextField) -> (isValid: Swift.Bool, message: Swift.String)
+  public func validateLandline(textField: FormTextField) -> (isValid: Swift.Bool, message: Swift.String)
+  public func validateIfInputIsMandatory(textField: FormTextField) -> (isValid: Swift.Bool, message: Swift.String)
+  @objc override dynamic public init()
+  @objc deinit
+}
+extension TextFieldValidator : UIKit.UITextFieldDelegate {
+  @_Concurrency.MainActor @preconcurrency @objc dynamic open func textFieldDidBeginEditing(_ textField: UIKit.UITextField)
+  @_Concurrency.MainActor @preconcurrency @objc dynamic open func textFieldDidEndEditing(_ textField: UIKit.UITextField)
+  @_Concurrency.MainActor @preconcurrency @objc dynamic open func textField(_ textField: UIKit.UITextField, shouldChangeCharactersIn range: Foundation.NSRange, replacementString string: Swift.String) -> Swift.Bool
+  @_Concurrency.MainActor @preconcurrency @objc dynamic open func textFieldShouldReturn(_ textField: UIKit.UITextField) -> Swift.Bool
+  @objc dynamic open func textFieldDidEdit(_ textField: FormTextField)
+}
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor @preconcurrency open class FormTokenValidator : TextFieldValidator {
+  @_Concurrency.MainActor @preconcurrency public var errorLabel: UIKit.UILabel?
+  @objc override dynamic open func textFieldDidEdit(_ textField: FormTextField)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func textField(_ textField: UIKit.UITextField, shouldChangeCharactersIn range: Foundation.NSRange, replacementString string: Swift.String) -> Swift.Bool
+  @objc override dynamic public init()
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor @preconcurrency open class FormCheckBoxView : FormElementView {
+  @_Concurrency.MainActor @preconcurrency public var titleLabel: TextFieldTitleLabel
+  @_Concurrency.MainActor @preconcurrency public var imageView: UIKit.UIImageView
+  @_Concurrency.MainActor @preconcurrency public var activeTitleLabel: ActiveLabel?
+  @_Concurrency.MainActor @preconcurrency public var title: Swift.String? {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency public var isSelected: Swift.Bool
+  @_Concurrency.MainActor @preconcurrency public var onSelection: ((_ isSelected: Swift.Bool) -> ())?
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public init(frame: CoreFoundation.CGRect)
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder aDecoder: Foundation.NSCoder)
+  @_Concurrency.MainActor @preconcurrency convenience public init(title: Swift.String, isSelected: Swift.Bool)
+  @_Concurrency.MainActor @preconcurrency convenience public init(actLbl: ActiveLabel, isSelected: Swift.Bool)
+  @_Concurrency.MainActor @preconcurrency public func toggleSelection()
+  @_Concurrency.MainActor @preconcurrency public func reset()
+  @objc deinit
+}
+public struct DefaultsKey<ValueType> where ValueType : DefaultsSerializable {
+  public let _key: Swift.String
+  public let defaultValue: ValueType.T?
+  public init(_ key: Swift.String, defaultValue: ValueType.T)
+  @available(*, unavailable, message: "This key needs a `defaultValue` parameter. If this type does not have a default value, consider using an optional key.")
+  public init(_ key: Swift.String)
+}
+extension DefaultsKey where ValueType : OptionalType, ValueType.Wrapped : DefaultsSerializable {
+  public init(_ key: Swift.String)
+  public init(_ key: Swift.String, defaultValue: ValueType.T)
+}
+public protocol DefaultsSerializable {
+  typealias T = Self.Bridge.T
+  associatedtype Bridge : DefaultsBridge
+  associatedtype ArrayBridge : DefaultsBridge
+  static var _defaults: Self.Bridge { get }
+  static var _defaultsArray: Self.ArrayBridge { get }
+}
+public protocol ActiveLabelDelegate : AnyObject {
+  func didSelect(_ text: Swift.String, type: ActiveType)
+}
+public typealias ConfigureLinkAttribute = (ActiveType, [Foundation.NSAttributedString.Key : Any], Swift.Bool) -> ([Foundation.NSAttributedString.Key : Any])
+@objc @_inheritsConvenienceInitializers @IBDesignable @_Concurrency.MainActor @preconcurrency open class ActiveLabel : UIKit.UILabel {
+  @_Concurrency.MainActor @preconcurrency weak open var delegate: (any ActiveLabelDelegate)?
+  @_Concurrency.MainActor @preconcurrency open var enabledTypes: [ActiveType]
+  @_Concurrency.MainActor @preconcurrency open var urlMaximumLength: Swift.Int?
+  @_Concurrency.MainActor @preconcurrency open var configureLinkAttribute: ConfigureLinkAttribute?
+  @objc @IBInspectable @_Concurrency.MainActor @preconcurrency open var mentionColor: UIKit.UIColor {
+    @objc get
+    @objc set
+  }
+  @objc @IBInspectable @_Concurrency.MainActor @preconcurrency open var mentionSelectedColor: UIKit.UIColor? {
+    @objc get
+    @objc set
+  }
+  @objc @IBInspectable @_Concurrency.MainActor @preconcurrency open var hashtagColor: UIKit.UIColor {
+    @objc get
+    @objc set
+  }
+  @objc @IBInspectable @_Concurrency.MainActor @preconcurrency open var hashtagSelectedColor: UIKit.UIColor? {
+    @objc get
+    @objc set
+  }
+  @objc @IBInspectable @_Concurrency.MainActor @preconcurrency open var URLColor: UIKit.UIColor {
+    @objc get
+    @objc set
+  }
+  @objc @IBInspectable @_Concurrency.MainActor @preconcurrency open var URLSelectedColor: UIKit.UIColor? {
+    @objc get
+    @objc set
+  }
+  @_Concurrency.MainActor @preconcurrency open var customColor: [ActiveType : UIKit.UIColor] {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency open var customSelectedColor: [ActiveType : UIKit.UIColor] {
+    get
+    set
+  }
+  @objc @IBInspectable @_Concurrency.MainActor @preconcurrency public var lineSpacing: CoreFoundation.CGFloat {
+    @objc get
+    @objc set
+  }
+  @objc @IBInspectable @_Concurrency.MainActor @preconcurrency public var minimumLineHeight: CoreFoundation.CGFloat {
+    @objc get
+    @objc set
+  }
+  @objc @IBInspectable @_Concurrency.MainActor @preconcurrency public var highlightFontName: Swift.String? {
+    @objc get
+    @objc set
+  }
+  @_Concurrency.MainActor @preconcurrency public var highlightFontSize: CoreFoundation.CGFloat? {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency open func handleMentionTap(_ handler: @escaping (Swift.String) -> ())
+  @_Concurrency.MainActor @preconcurrency open func handleHashtagTap(_ handler: @escaping (Swift.String) -> ())
+  @_Concurrency.MainActor @preconcurrency open func handleURLTap(_ handler: @escaping (Foundation.URL) -> ())
+  @_Concurrency.MainActor @preconcurrency open func handleCustomTap(for type: ActiveType, handler: @escaping (Swift.String) -> ())
+  @_Concurrency.MainActor @preconcurrency open func handleEmailTap(_ handler: @escaping (Swift.String) -> ())
+  @_Concurrency.MainActor @preconcurrency open func removeHandle(for type: ActiveType)
+  @_Concurrency.MainActor @preconcurrency open func filterMention(_ predicate: @escaping (Swift.String) -> Swift.Bool)
+  @_Concurrency.MainActor @preconcurrency open func filterHashtag(_ predicate: @escaping (Swift.String) -> Swift.Bool)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open var text: Swift.String? {
+    @objc get
+    @objc set
+  }
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open var attributedText: Foundation.NSAttributedString? {
+    @objc get
+    @objc set
+  }
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open var font: UIKit.UIFont! {
+    @objc get
+    @objc set
+  }
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open var textColor: UIKit.UIColor! {
+    @objc get
+    @objc set
+  }
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open var textAlignment: UIKit.NSTextAlignment {
+    @objc get
+    @objc set
+  }
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open var numberOfLines: Swift.Int {
+    @objc get
+    @objc set
+  }
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open var lineBreakMode: UIKit.NSLineBreakMode {
+    @objc get
+    @objc set
+  }
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public init(frame: CoreFoundation.CGRect)
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder aDecoder: Foundation.NSCoder)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func awakeFromNib()
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func drawText(in rect: CoreFoundation.CGRect)
+  @discardableResult
+  @_Concurrency.MainActor @preconcurrency open func customize(_ block: (_ label: ActiveLabel) -> ()) -> ActiveLabel
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open var intrinsicContentSize: CoreFoundation.CGSize {
+    @objc get
+  }
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func touchesBegan(_ touches: Swift.Set<UIKit.UITouch>, with event: UIKit.UIEvent?)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func touchesMoved(_ touches: Swift.Set<UIKit.UITouch>, with event: UIKit.UIEvent?)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func touchesCancelled(_ touches: Swift.Set<UIKit.UITouch>, with event: UIKit.UIEvent?)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func touchesEnded(_ touches: Swift.Set<UIKit.UITouch>, with event: UIKit.UIEvent?)
+  @objc deinit
+}
+extension ActiveLabel : UIKit.UIGestureRecognizerDelegate {
+  @_Concurrency.MainActor @preconcurrency @objc dynamic public func gestureRecognizer(_ gestureRecognizer: UIKit.UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIKit.UIGestureRecognizer) -> Swift.Bool
+  @_Concurrency.MainActor @preconcurrency @objc dynamic public func gestureRecognizer(_ gestureRecognizer: UIKit.UIGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: UIKit.UIGestureRecognizer) -> Swift.Bool
+  @_Concurrency.MainActor @preconcurrency @objc dynamic public func gestureRecognizer(_ gestureRecognizer: UIKit.UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIKit.UIGestureRecognizer) -> Swift.Bool
+}
+extension Swift.String {
+  public func sanitized() -> Swift.String
+}
+extension UIKit.UIView {
+  @_Concurrency.MainActor @preconcurrency public class var identifier: Swift.String {
+    get
+  }
+  @_Concurrency.MainActor @preconcurrency public var screenWidth: CoreFoundation.CGFloat {
+    get
+  }
+  @_Concurrency.MainActor @preconcurrency public var frameWidth: CoreFoundation.CGFloat {
+    get
+  }
+  @_Concurrency.MainActor @preconcurrency public var frameHeight: CoreFoundation.CGFloat {
+    get
+  }
+  @_Concurrency.MainActor @preconcurrency public var boundsWidth: CoreFoundation.CGFloat {
+    get
+  }
+  @_Concurrency.MainActor @preconcurrency public var boundsHeight: CoreFoundation.CGFloat {
+    get
+  }
+  @_Concurrency.MainActor @preconcurrency public func addCornerRadius(radius: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func roundCorners(corners: UIKit.UIRectCorner, radius: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func setupForAutolayout(in view: UIKit.UIView)
+  @_Concurrency.MainActor @preconcurrency public func pinTrailingToTrailing(of view: UIKit.UIView, constant: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func pinTrailingToLeading(of view: UIKit.UIView, constant: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func pinTopToTopSafeArea(of view: UIKit.UIView, constant: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func pinTopToTop(of view: UIKit.UIView, constant: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func pinTopToBottom(of view: UIKit.UIView, constant: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func pinLeadingToLeading(of view: UIKit.UIView, constant: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func pinLeadingToTrailing(of view: UIKit.UIView, constant: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func pinBottomToBottom(of view: UIKit.UIView, constant: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func pinBottomToBottomSafeArea(of view: UIKit.UIView, constant: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func pinBottomToTop(of view: UIKit.UIView, constant: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func pinEqualHeight(to view: UIKit.UIView, constant: CoreFoundation.CGFloat = 0)
+  @_Concurrency.MainActor @preconcurrency public func pinEqualWidth(to view: UIKit.UIView, constant: CoreFoundation.CGFloat = 0)
+  @_Concurrency.MainActor @preconcurrency public func pinHeight(constant: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func pinHeightProportional(to view: UIKit.UIView, multiplier: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func pinWidthProportional(to view: UIKit.UIView, multiplier: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func pinWidth(constant: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency public func pinToCenterHorizontally(in view: UIKit.UIView, constant: CoreFoundation.CGFloat = 0)
+  @_Concurrency.MainActor @preconcurrency public func pinToCenterVertically(in view: UIKit.UIView, constant: CoreFoundation.CGFloat = 0)
+  @_Concurrency.MainActor @preconcurrency public var topSafeAreaHeight: CoreFoundation.CGFloat {
+    get
+  }
+  @_Concurrency.MainActor @preconcurrency public func pin(left: CoreFoundation.CGFloat, right: CoreFoundation.CGFloat, top: CoreFoundation.CGFloat, bottom: CoreFoundation.CGFloat, toView view: UIKit.UIView)
+  @_Concurrency.MainActor @preconcurrency public func addDropShadow()
+  @_Concurrency.MainActor @preconcurrency public func rotate180Degree()
+  @_Concurrency.MainActor @preconcurrency public func setRandomColorBackground()
+  @_Concurrency.MainActor @preconcurrency public func displayEmbeddedMessage(label: UIKit.UILabel, message: Swift.String)
+  @_Concurrency.MainActor @preconcurrency public func hideEmbeddedMessage(label: UIKit.UILabel?)
+  @_Concurrency.MainActor @preconcurrency public func showActivityIndicator(indicator: UIKit.UIActivityIndicatorView?)
+  @_Concurrency.MainActor @preconcurrency public func hideActivityIndicator(indicator: UIKit.UIActivityIndicatorView?)
+  @_Concurrency.MainActor @preconcurrency public func addGradient(colors: [UIKit.UIColor] = [.black, .clear], locations: [Foundation.NSNumber] = [0, 1.0], startPoint: CoreFoundation.CGPoint = CGPoint(x: 0.5, y: 0.0), endPoint: CoreFoundation.CGPoint = CGPoint(x: 0.5, y: 1.0), type: QuartzCore.CAGradientLayerType = .axial)
+}
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor @preconcurrency public class RootViewController : UIKit.UIViewController {
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public func viewDidLoad()
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public func viewWillAppear(_ animated: Swift.Bool)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public func viewWillDisappear(_ animated: Swift.Bool)
+  @_Concurrency.MainActor @preconcurrency public func setupScrollViewWhenKeyboardAppears(scrollView: UIKit.UIScrollView)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public init(nibName nibNameOrNil: Swift.String?, bundle nibBundleOrNil: Foundation.Bundle?)
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder: Foundation.NSCoder)
+  @objc deinit
+}
+open class AttributedStringBuilder {
+  public var plainString: Swift.String
+  public init(string: Swift.String)
+  public init()
+  public func font(font: UIKit.UIFont) -> AttributedStringBuilder
+  public func paragraphSpacing(lineSpacing: CoreFoundation.CGFloat) -> AttributedStringBuilder
+  public func spacing(spacing: CoreFoundation.CGFloat) -> AttributedStringBuilder
+  public func color(color: UIKit.UIColor) -> AttributedStringBuilder
+  public func bgColor(color: UIKit.UIColor) -> AttributedStringBuilder
+  public func underline(color: UIKit.UIColor) -> AttributedStringBuilder
+  public func url(url: Foundation.URL) -> AttributedStringBuilder
+  public func build() -> Foundation.NSAttributedString
+  public func build(with string: Swift.String) -> Foundation.NSAttributedString
+  public func addCharacterSpacing(kernValue: Swift.Double = 3) -> Foundation.NSAttributedString
+  public func bottomOffset(offset: Swift.Int) -> AttributedStringBuilder
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor @preconcurrency open class FormTextField : UIKit.UITextField {
+  @_Concurrency.MainActor @preconcurrency public var validationType: ValidationType
+  @_Concurrency.MainActor @preconcurrency public var characterLimit: Swift.Int
+  @_Concurrency.MainActor @preconcurrency public var isRequired: Swift.Bool
+  @_Concurrency.MainActor @preconcurrency public var isErrorPresent: Swift.Bool
+  @_Concurrency.MainActor @preconcurrency public var isValid: Swift.Bool
+  @_Concurrency.MainActor @preconcurrency public var messageEmptyField: Swift.String
+  @_Concurrency.MainActor @preconcurrency open func showError(message: Swift.String)
+  @_Concurrency.MainActor @preconcurrency open func hideError()
+  @_Concurrency.MainActor @preconcurrency open func showValidIndicator()
+  @_Concurrency.MainActor @preconcurrency open func hideValidIndicator()
+  @_Concurrency.MainActor @preconcurrency open func reset()
+  @_Concurrency.MainActor @preconcurrency open func disabled()
+  @_Concurrency.MainActor @preconcurrency open func enabled()
+  @_Concurrency.MainActor @preconcurrency open func setText(text: Swift.String?, isEditable: Swift.Bool = true)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public init(frame: CoreFoundation.CGRect)
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder: Foundation.NSCoder)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency open class BoxTextField : FormTextField {
+  @_Concurrency.MainActor @preconcurrency final public let bottomInset: CoreFoundation.CGFloat
+  @_Concurrency.MainActor @preconcurrency public var leftPadding: CoreFoundation.CGFloat
+  @_Concurrency.MainActor @preconcurrency public var rightPadding: CoreFoundation.CGFloat
+  @_Concurrency.MainActor @preconcurrency public var topPadding: CoreFoundation.CGFloat
+  @_Concurrency.MainActor @preconcurrency public var bottomPadding: CoreFoundation.CGFloat
+  @_Concurrency.MainActor @preconcurrency final public let boxLayer: QuartzCore.CAShapeLayer
+  @_Concurrency.MainActor @preconcurrency final public let errorLabel: UIKit.UILabel
+  @_Concurrency.MainActor @preconcurrency public var rightImageView: UIKit.UIImageView?
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder aDecoder: Foundation.NSCoder)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func textRect(forBounds bounds: CoreFoundation.CGRect) -> CoreFoundation.CGRect
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func placeholderRect(forBounds bounds: CoreFoundation.CGRect) -> CoreFoundation.CGRect
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func editingRect(forBounds bounds: CoreFoundation.CGRect) -> CoreFoundation.CGRect
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func layoutSubviews()
+  @_Concurrency.MainActor @preconcurrency public func setupViews()
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func traitCollectionDidChange(_ previousTraitCollection: UIKit.UITraitCollection?)
+  @_Concurrency.MainActor @preconcurrency override public func showError(message: Swift.String)
+  @_Concurrency.MainActor @preconcurrency override public func hideError()
+  @_Concurrency.MainActor @preconcurrency override public func reset()
+  @_Concurrency.MainActor @preconcurrency override public func disabled()
+  @_Concurrency.MainActor @preconcurrency override public func enabled()
+  @_Concurrency.MainActor @preconcurrency override public func showValidIndicator()
+  @_Concurrency.MainActor @preconcurrency override public func hideValidIndicator()
+  @_Concurrency.MainActor @preconcurrency public func addImageToRight(withImage: UIKit.UIImage?)
+  @_Concurrency.MainActor @preconcurrency public func addImageToLeft(withImage: UIKit.UIImage?)
+  @objc deinit
+}
+public enum EsewaSDKEnvironment : Swift.String {
+  case development
+  case production
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum EsewaSDKError : Swift.Error {
+  case noInternetConnection
+  case unknownError
+  case invalidMerchant
+  case apiError(message: Swift.String)
+  case invalidResponse
+  case cancelPayment
+  case authError(message: Swift.String)
+  case tokenNotEntered
+  case invalidToken
+}
+extension UIKit.UIDevice {
+  public enum DeviceType : Swift.String {
+    case iPhone4
+    case iPhone5
+    case iPhone6
+    case iPhone6Plus
+    case iPhoneX
+    case iPhone11
+    case iPhoneXR
+    case unknown
+    case iphone12Mini
+    public init?(rawValue: Swift.String)
+    @available(iOS 2.0, *)
+    public typealias RawValue = Swift.String
+    public var rawValue: Swift.String {
+      get
+    }
+  }
+  @_Concurrency.MainActor @preconcurrency public var deviceType: UIKit.UIDevice.DeviceType {
+    get
+  }
+}
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor @preconcurrency open class BalanceStackView : FormElementView {
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public init(frame: CoreFoundation.CGRect)
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder aDecoder: Foundation.NSCoder)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor @preconcurrency open class SMSegmentView : UIKit.UIControl {
+  @_Concurrency.MainActor @preconcurrency open var segmentAppearance: SMSegmentAppearance?
+  @_Concurrency.MainActor @preconcurrency open var dividerColour: UIKit.UIColor {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency open var dividerWidth: CoreFoundation.CGFloat {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency open var selectedSegmentIndex: Swift.Int {
+    get
+    set(newIndex)
+  }
+  @_Concurrency.MainActor @preconcurrency open var organiseMode: SMSegmentOrganiseMode {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency open var numberOfSegments: Swift.Int {
+    get
+  }
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder aDecoder: Foundation.NSCoder)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public init(frame: CoreFoundation.CGRect)
+  @_Concurrency.MainActor @preconcurrency public init(frame: CoreFoundation.CGRect, dividerColour: UIKit.UIColor, dividerWidth: CoreFoundation.CGFloat, segmentAppearance: SMSegmentAppearance, isFromLogin: Swift.Bool = false)
+  @_Concurrency.MainActor @preconcurrency open func addSegmentWithTitle(_ title: Swift.String?, onSelectionImage: UIKit.UIImage?, offSelectionImage: UIKit.UIImage?)
+  @_Concurrency.MainActor @preconcurrency open func insertSegmentWithTitle(_ title: Swift.String?, onSelectionImage: UIKit.UIImage?, offSelectionImage: UIKit.UIImage?, index: Swift.Int)
+  @_Concurrency.MainActor @preconcurrency open func removeSegmentAtIndex(_ index: Swift.Int)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func layoutSubviews()
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func draw(_ rect: CoreFoundation.CGRect)
+  @objc deinit
+}
+open class SMSegmentAppearance {
+  open var segmentOnSelectionColour: UIKit.UIColor
+  open var segmentOffSelectionColour: UIKit.UIColor
+  open var segmentTouchDownColour: UIKit.UIColor {
+    get
+  }
+  open var titleOnSelectionColour: UIKit.UIColor
+  open var titleOffSelectionColour: UIKit.UIColor
+  open var titleOnSelectionFont: UIKit.UIFont
+  open var titleOffSelectionFont: UIKit.UIFont
+  open var titleGravity: SMSTitleGravity
+  open var contentVerticalMargin: CoreFoundation.CGFloat
+  public init()
+  public init(contentVerticalMargin: CoreFoundation.CGFloat, segmentOnSelectionColour: UIKit.UIColor, segmentOffSelectionColour: UIKit.UIColor, titleOnSelectionColour: UIKit.UIColor, titleOffSelectionColour: UIKit.UIColor, titleOnSelectionFont: UIKit.UIFont, titleOffSelectionFont: UIKit.UIFont, titleGravity: SMSTitleGravity?)
+  @objc deinit
+}
+public protocol DefaultsProviding {
+  associatedtype KeyStore : DefaultsKeyStore
+  subscript<T>(key key: DefaultsKey<T>) -> T.T where T : DefaultsSerializable, T : OptionalType, T == T.Bridge.T { get nonmutating set }
+  subscript<T>(key key: DefaultsKey<T>) -> T.T where T : DefaultsSerializable, T == T.Bridge.T { get nonmutating set }
+  subscript<T>(keyPath: Swift.KeyPath<Self.KeyStore, DefaultsKey<T>>) -> T.T where T : DefaultsSerializable, T : OptionalType, T == T.Bridge.T { get nonmutating set }
+  subscript<T>(keyPath: Swift.KeyPath<Self.KeyStore, DefaultsKey<T>>) -> T.T where T : DefaultsSerializable, T == T.Bridge.T { get nonmutating set }
+  subscript<T>(dynamicMember keyPath: Swift.KeyPath<Self.KeyStore, DefaultsKey<T>>) -> T.T where T : DefaultsSerializable, T : OptionalType, T == T.Bridge.T { get nonmutating set }
+  subscript<T>(dynamicMember keyPath: Swift.KeyPath<Self.KeyStore, DefaultsKey<T>>) -> T.T where T : DefaultsSerializable, T == T.Bridge.T { get nonmutating set }
+}
+extension DefaultsAdapter : DefaultsProviding {
+  public subscript<T>(key key: DefaultsKey<T>) -> T.T where T : DefaultsSerializable, T : OptionalType, T == T.Bridge.T {
+    get
+    nonmutating set
+  }
+  public subscript<T>(key key: DefaultsKey<T>) -> T.T where T : DefaultsSerializable, T == T.Bridge.T {
+    get
+    nonmutating set
+  }
+  public subscript<T>(keyPath: Swift.KeyPath<KeyStore, DefaultsKey<T>>) -> T.T where T : DefaultsSerializable, T : OptionalType, T == T.Bridge.T {
+    get
+    nonmutating set
+  }
+  public subscript<T>(keyPath: Swift.KeyPath<KeyStore, DefaultsKey<T>>) -> T.T where T : DefaultsSerializable, T == T.Bridge.T {
+    get
+    nonmutating set
+  }
+  public subscript<T>(dynamicMember keyPath: Swift.KeyPath<KeyStore, DefaultsKey<T>>) -> T.T where T : DefaultsSerializable, T : OptionalType, T == T.Bridge.T {
+    get
+    nonmutating set
+  }
+  public subscript<T>(dynamicMember keyPath: Swift.KeyPath<KeyStore, DefaultsKey<T>>) -> T.T where T : DefaultsSerializable, T == T.Bridge.T {
+    get
+    nonmutating set
+  }
+}
+extension Foundation.UserDefaults {
+  public subscript<T>(key: DefaultsKey<T>) -> T.T where T : DefaultsSerializable, T : OptionalType, T == T.Bridge.T {
+    get
+    set
+  }
+  public subscript<T>(key: DefaultsKey<T>) -> T.T where T : DefaultsSerializable, T == T.Bridge.T {
+    get
+    set
+  }
+}
+@objc public protocol EsewaSDKPaymentDelegate {
+  @objc func onEsewaSDKPaymentSuccess(info: [Swift.String : Any])
+  @objc func onEsewaSDKPaymentError(errorDescription: Swift.String)
+}
+@objc public class EsewaSDK : ObjectiveC.NSObject {
+  public static var environment: EsewaSDKEnvironment
+  public init(inViewController viewController: UIKit.UIViewController, environment: EsewaSDKEnvironment, delegate: any EsewaSDKPaymentDelegate)
+  public func initiatePayment(merchantId: Swift.String, merchantSecret: Swift.String, productName: Swift.String, productAmount: Swift.String, productId: Swift.String, callbackUrl: Swift.String, paymentProperties: [Swift.String : Any]?)
+  @objc deinit
+}
+public enum ActiveType {
+  case mention
+  case hashtag
+  case url
+  case email
+  case custom(pattern: Swift.String)
+}
+extension ActiveType : Swift.Hashable, Swift.Equatable {
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public func == (lhs: ActiveType, rhs: ActiveType) -> Swift.Bool
+extension UIKit.UIView {
+  @_Concurrency.MainActor @preconcurrency public func addShadowToView(opacity: Swift.Float = 0.5, color: UIKit.UIColor = UIColor.black, radius: CoreFoundation.CGFloat = ThemeMangerEnhance.Shadow.Radius.Umbra.dp4, offset: CoreFoundation.CGSize = ThemeMangerEnhance.Shadow.Offset.Umbra.dp4)
+  @_Concurrency.MainActor @preconcurrency public func addShadowToViewBottom(opacity: Swift.Float = 0.5, color: UIKit.UIColor = UIColor.black, radius: CoreFoundation.CGFloat = ThemeMangerEnhance.Shadow.Radius.Umbra.dp4, offset: CoreFoundation.CGSize = ThemeMangerEnhance.Shadow.Offset.Umbra.dp4)
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency open class FormTitleView : FormElementView {
+  @_Concurrency.MainActor @preconcurrency public var titleLabel: UIKit.UILabel
+  @_Concurrency.MainActor @preconcurrency public var text: Swift.String? {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency public var attributedText: Foundation.NSAttributedString? {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder aDecoder: Foundation.NSCoder)
+  @_Concurrency.MainActor @preconcurrency convenience public init(title: Swift.String)
+  @_Concurrency.MainActor @preconcurrency override open func toggleTextVisibility(shouldHide: Swift.Bool)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency open class FormTitleWithImageView : FormElementView {
+  @_Concurrency.MainActor @preconcurrency public var titleLabel: UIKit.UILabel
+  @_Concurrency.MainActor @preconcurrency public var iconImageView: UIKit.UIImageView
+  @_Concurrency.MainActor @preconcurrency public var onIconClicked: (() -> Swift.Void)?
+  @_Concurrency.MainActor @preconcurrency public var iconImage: Swift.String? {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency public var text: Swift.String? {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency public var attributedText: Foundation.NSAttributedString? {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder aDecoder: Foundation.NSCoder)
+  @_Concurrency.MainActor @preconcurrency convenience public init(title: Swift.String)
+  @_Concurrency.MainActor @preconcurrency override open func toggleTextVisibility(shouldHide: Swift.Bool)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor @preconcurrency open class FormCloseButtonView : FormElementView {
+  @_Concurrency.MainActor @preconcurrency public var titleLabel: UIKit.UILabel
+  @_Concurrency.MainActor @preconcurrency public var closeButton: UIKit.UIButton
+  @_Concurrency.MainActor @preconcurrency public var closeTapAction: (() -> ())?
+  @_Concurrency.MainActor @preconcurrency public var text: Swift.String? {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public init(frame: CoreFoundation.CGRect)
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder aDecoder: Foundation.NSCoder)
+  @_Concurrency.MainActor @preconcurrency convenience public init(title: Swift.String, image: Swift.String)
+  @_Concurrency.MainActor @preconcurrency override open func toggleTextVisibility(shouldHide: Swift.Bool)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency open class EscrowFormTitleView : FormElementView {
+  @_Concurrency.MainActor @preconcurrency public var titleLabel: UIKit.UILabel
+  @_Concurrency.MainActor @preconcurrency public var text: Swift.String? {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder aDecoder: Foundation.NSCoder)
+  @_Concurrency.MainActor @preconcurrency convenience public init(title: Swift.String)
+  @_Concurrency.MainActor @preconcurrency override open func toggleTextVisibility(shouldHide: Swift.Bool)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor @preconcurrency public class RequestViewController : RootViewController {
+  @objc @IBOutlet @_Concurrency.MainActor @preconcurrency weak public var indicator: UIKit.UIActivityIndicatorView!
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public func viewDidLoad()
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public init(nibName nibNameOrNil: Swift.String?, bundle nibBundleOrNil: Foundation.Bundle?)
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder: Foundation.NSCoder)
+  @objc deinit
+}
+extension DefaultsSerializable {
+  public static var _defaultsArray: DefaultsArrayBridge<[Self.T]> {
+    get
+  }
+}
+extension Foundation.Date : DefaultsSerializable {
+  public static var _defaults: DefaultsObjectBridge<Foundation.Date> {
+    get
+  }
+  @available(iOS 8.0, tvOS 9.0, watchOS 2.0, macOS 10.10, *)
+  public typealias ArrayBridge = DefaultsCodableBridge<[Foundation.Date]>
+  @available(iOS 8.0, tvOS 9.0, watchOS 2.0, macOS 10.10, *)
+  public typealias Bridge = DefaultsObjectBridge<Foundation.Date>
+}
+extension Swift.String : DefaultsSerializable {
+  public static var _defaults: DefaultsStringBridge {
+    get
+  }
+  public typealias ArrayBridge = DefaultsCodableBridge<[Swift.String]>
+  public typealias Bridge = DefaultsStringBridge
+}
+extension Swift.Int : DefaultsSerializable {
+  public static var _defaults: DefaultsIntBridge {
+    get
+  }
+  public typealias ArrayBridge = DefaultsCodableBridge<[Swift.Int]>
+  public typealias Bridge = DefaultsIntBridge
+}
+extension Swift.Double : DefaultsSerializable {
+  public static var _defaults: DefaultsDoubleBridge {
+    get
+  }
+  public typealias ArrayBridge = DefaultsCodableBridge<[Swift.Double]>
+  public typealias Bridge = DefaultsDoubleBridge
+}
+extension Swift.Bool : DefaultsSerializable {
+  public static var _defaults: DefaultsBoolBridge {
+    get
+  }
+  public typealias ArrayBridge = DefaultsCodableBridge<[Swift.Bool]>
+  public typealias Bridge = DefaultsBoolBridge
+}
+extension Foundation.Data : DefaultsSerializable {
+  public static var _defaults: DefaultsDataBridge {
+    get
+  }
+  @available(iOS 8.0, tvOS 9.0, watchOS 2.0, macOS 10.10, *)
+  public typealias ArrayBridge = DefaultsCodableBridge<[Foundation.Data]>
+  @available(iOS 8.0, tvOS 9.0, watchOS 2.0, macOS 10.10, *)
+  public typealias Bridge = DefaultsDataBridge
+}
+extension Foundation.URL : DefaultsSerializable {
+  public static var _defaults: DefaultsUrlBridge {
+    get
+  }
+  public static var _defaultsArray: DefaultsKeyedArchiverBridge<[Foundation.URL]> {
+    get
+  }
+  @available(iOS 8.0, tvOS 9.0, watchOS 2.0, macOS 10.10, *)
+  public typealias ArrayBridge = DefaultsKeyedArchiverBridge<[Foundation.URL]>
+  @available(iOS 8.0, tvOS 9.0, watchOS 2.0, macOS 10.10, *)
+  public typealias Bridge = DefaultsUrlBridge
+}
+extension DefaultsSerializable where Self : Swift.Decodable, Self : Swift.Encodable {
+  public static var _defaults: DefaultsCodableBridge<Self> {
+    get
+  }
+  public static var _defaultsArray: DefaultsCodableBridge<[Self]> {
+    get
+  }
+}
+extension DefaultsSerializable where Self : Swift.RawRepresentable {
+  public static var _defaults: DefaultsRawRepresentableBridge<Self> {
+    get
+  }
+  public static var _defaultsArray: DefaultsRawRepresentableArrayBridge<[Self]> {
+    get
+  }
+}
+extension DefaultsSerializable where Self : Foundation.NSCoding {
+  public static var _defaults: DefaultsKeyedArchiverBridge<Self> {
+    get
+  }
+  public static var _defaultsArray: DefaultsKeyedArchiverBridge<[Self]> {
+    get
+  }
+}
+extension Swift.Dictionary : DefaultsSerializable where Key == Swift.String {
+  public typealias T = [Key : Value]
+  public typealias Bridge = DefaultsObjectBridge<Swift.Dictionary<Key, Value>.T>
+  public typealias ArrayBridge = DefaultsArrayBridge<[Swift.Dictionary<Key, Value>.T]>
+  public static var _defaults: Swift.Dictionary<Swift.String, Value>.Bridge {
+    get
+  }
+  public static var _defaultsArray: Swift.Dictionary<Swift.String, Value>.ArrayBridge {
+    get
+  }
+}
+extension Swift.Array : DefaultsSerializable where Element : DefaultsSerializable {
+  public typealias T = [Element.T]
+  public typealias Bridge = Element.ArrayBridge
+  public typealias ArrayBridge = DefaultsObjectBridge<[Swift.Array<Element>.T]>
+  public static var _defaults: Swift.Array<Element>.Bridge {
+    get
+  }
+  public static var _defaultsArray: Swift.Array<Element>.ArrayBridge {
+    get
+  }
+}
+#if compiler(>=5.3) && $NoncopyableGenerics
+extension Swift.Optional : DefaultsSerializable where Wrapped : DefaultsSerializable {
+  public typealias Bridge = DefaultsOptionalBridge<Wrapped.Bridge>
+  public typealias ArrayBridge = DefaultsOptionalBridge<Wrapped.ArrayBridge>
+  public static var _defaults: DefaultsOptionalBridge<Wrapped.Bridge> {
+    get
+  }
+  public static var _defaultsArray: DefaultsOptionalBridge<Wrapped.ArrayBridge> {
+    get
+  }
+}
+#else
+extension Swift.Optional : DefaultsSerializable where Wrapped : DefaultsSerializable {
+  public typealias Bridge = DefaultsOptionalBridge<Wrapped.Bridge>
+  public typealias ArrayBridge = DefaultsOptionalBridge<Wrapped.ArrayBridge>
+  public static var _defaults: DefaultsOptionalBridge<Wrapped.Bridge> {
+    get
+  }
+  public static var _defaultsArray: DefaultsOptionalBridge<Wrapped.ArrayBridge> {
+    get
+  }
+}
+#endif
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency open class TextFieldTitleLabel : UIKit.UILabel {
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder aDecoder: Foundation.NSCoder)
+  @objc deinit
+}
+public protocol DefaultsBridge {
+  associatedtype T
+  func get(key: Swift.String, userDefaults: Foundation.UserDefaults) -> Self.T?
+  func save(key: Swift.String, value: Self.T?, userDefaults: Foundation.UserDefaults)
+  func deserialize(_ object: Any) -> Self.T?
+}
+public struct DefaultsObjectBridge<T> : DefaultsBridge {
+  public init()
+  public func save(key: Swift.String, value: T?, userDefaults: Foundation.UserDefaults)
+  public func get(key: Swift.String, userDefaults: Foundation.UserDefaults) -> T?
+  public func deserialize(_ object: Any) -> T?
+}
+public struct DefaultsArrayBridge<T> : DefaultsBridge where T : Swift.Collection {
+  public init()
+  public func save(key: Swift.String, value: T?, userDefaults: Foundation.UserDefaults)
+  public func get(key: Swift.String, userDefaults: Foundation.UserDefaults) -> T?
+  public func deserialize(_ object: Any) -> T?
+}
+public struct DefaultsStringBridge : DefaultsBridge {
+  public init()
+  public func save(key: Swift.String, value: Swift.String?, userDefaults: Foundation.UserDefaults)
+  public func get(key: Swift.String, userDefaults: Foundation.UserDefaults) -> Swift.String?
+  public func deserialize(_ object: Any) -> Swift.String?
+  public typealias T = Swift.String
+}
+public struct DefaultsIntBridge : DefaultsBridge {
+  public init()
+  public func save(key: Swift.String, value: Swift.Int?, userDefaults: Foundation.UserDefaults)
+  public func get(key: Swift.String, userDefaults: Foundation.UserDefaults) -> Swift.Int?
+  public func deserialize(_ object: Any) -> Swift.Int?
+  public typealias T = Swift.Int
+}
+public struct DefaultsDoubleBridge : DefaultsBridge {
+  public init()
+  public func save(key: Swift.String, value: Swift.Double?, userDefaults: Foundation.UserDefaults)
+  public func get(key: Swift.String, userDefaults: Foundation.UserDefaults) -> Swift.Double?
+  public func deserialize(_ object: Any) -> Swift.Double?
+  public typealias T = Swift.Double
+}
+public struct DefaultsBoolBridge : DefaultsBridge {
+  public init()
+  public func save(key: Swift.String, value: Swift.Bool?, userDefaults: Foundation.UserDefaults)
+  public func get(key: Swift.String, userDefaults: Foundation.UserDefaults) -> Swift.Bool?
+  public func deserialize(_ object: Any) -> Swift.Bool?
+  public typealias T = Swift.Bool
+}
+public struct DefaultsDataBridge : DefaultsBridge {
+  public init()
+  public func save(key: Swift.String, value: Foundation.Data?, userDefaults: Foundation.UserDefaults)
+  public func get(key: Swift.String, userDefaults: Foundation.UserDefaults) -> Foundation.Data?
+  public func deserialize(_ object: Any) -> Foundation.Data?
+  public typealias T = Foundation.Data
+}
+public struct DefaultsUrlBridge : DefaultsBridge {
+  public init()
+  public func save(key: Swift.String, value: Foundation.URL?, userDefaults: Foundation.UserDefaults)
+  public func get(key: Swift.String, userDefaults: Foundation.UserDefaults) -> Foundation.URL?
+  public func deserialize(_ object: Any) -> Foundation.URL?
+  public typealias T = Foundation.URL
+}
+public struct DefaultsCodableBridge<T> : DefaultsBridge where T : Swift.Decodable, T : Swift.Encodable {
+  public init()
+  public func save(key: Swift.String, value: T?, userDefaults: Foundation.UserDefaults)
+  public func get(key: Swift.String, userDefaults: Foundation.UserDefaults) -> T?
+  public func deserialize(_ object: Any) -> T?
+}
+public struct DefaultsKeyedArchiverBridge<T> : DefaultsBridge {
+  public init()
+  public func save(key: Swift.String, value: T?, userDefaults: Foundation.UserDefaults)
+  public func get(key: Swift.String, userDefaults: Foundation.UserDefaults) -> T?
+  public func deserialize(_ object: Any) -> T?
+}
+public struct DefaultsRawRepresentableBridge<T> : DefaultsBridge where T : Swift.RawRepresentable {
+  public init()
+  public func save(key: Swift.String, value: T?, userDefaults: Foundation.UserDefaults)
+  public func get(key: Swift.String, userDefaults: Foundation.UserDefaults) -> T?
+  public func deserialize(_ object: Any) -> T?
+}
+public struct DefaultsRawRepresentableArrayBridge<T> : DefaultsBridge where T : Swift.Collection, T.Element : Swift.RawRepresentable {
+  public init()
+  public func save(key: Swift.String, value: T?, userDefaults: Foundation.UserDefaults)
+  public func get(key: Swift.String, userDefaults: Foundation.UserDefaults) -> T?
+  public func deserialize(_ object: Any) -> T?
+}
+public struct DefaultsOptionalBridge<Bridge> : DefaultsBridge where Bridge : DefaultsBridge {
+  public typealias T = Bridge.T?
+  public func get(key: Swift.String, userDefaults: Foundation.UserDefaults) -> DefaultsOptionalBridge<Bridge>.T?
+  public func save(key: Swift.String, value: DefaultsOptionalBridge<Bridge>.T?, userDefaults: Foundation.UserDefaults)
+  public func deserialize(_ object: Any) -> DefaultsOptionalBridge<Bridge>.T?
+}
+public struct DefaultsOptionalArrayBridge<Bridge> : DefaultsBridge where Bridge : DefaultsBridge, Bridge.T : Swift.Collection {
+  public typealias T = Bridge.T?
+  public func get(key: Swift.String, userDefaults: Foundation.UserDefaults) -> DefaultsOptionalArrayBridge<Bridge>.T?
+  public func save(key: Swift.String, value: DefaultsOptionalArrayBridge<Bridge>.T?, userDefaults: Foundation.UserDefaults)
+  public func deserialize(_ object: Any) -> DefaultsOptionalArrayBridge<Bridge>.T?
+}
+public protocol DefaultsKeyStore {
+}
+public struct DefaultsKeys : DefaultsKeyStore {
+  public init()
+}
+@dynamicMemberLookup public struct DefaultsAdapter<KeyStore> where KeyStore : DefaultsKeyStore {
+  public let defaults: Foundation.UserDefaults
+  public let keyStore: KeyStore
+  public init(defaults: Foundation.UserDefaults, keyStore: KeyStore)
+  @available(*, unavailable)
+  public subscript(dynamicMember member: Swift.String) -> Swift.Never {
+    get
+  }
+  public func hasKey<T>(_ key: DefaultsKey<T>) -> Swift.Bool where T : DefaultsSerializable
+  public func hasKey<T>(_ keyPath: Swift.KeyPath<KeyStore, DefaultsKey<T>>) -> Swift.Bool where T : DefaultsSerializable
+  public func remove<T>(_ key: DefaultsKey<T>) where T : DefaultsSerializable
+  public func remove<T>(_ keyPath: Swift.KeyPath<KeyStore, DefaultsKey<T>>) where T : DefaultsSerializable
+  public func removeAll()
+}
+public struct SMSegmentedControlKeys {
+}
+public enum SMSegmentOrganiseMode : Swift.Int {
+  case horizontal
+  case vertical
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum SMSTitleGravity {
+  case right
+  case bottom
+  case left
+  case top
+  public static func == (a: SMSTitleGravity, b: SMSTitleGravity) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor @preconcurrency open class FormElementView : UIKit.UIView {
+  @_Concurrency.MainActor @preconcurrency public var margin: UIKit.UIEdgeInsets
+  @_Concurrency.MainActor @preconcurrency public var height: CoreFoundation.CGFloat
+  @_Concurrency.MainActor @preconcurrency public var heightConstraint: UIKit.NSLayoutConstraint?
+  @_Concurrency.MainActor @preconcurrency public var topConstraint: UIKit.NSLayoutConstraint?
+  @_Concurrency.MainActor @preconcurrency open func toggleTextVisibility(shouldHide: Swift.Bool)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public init(frame: CoreFoundation.CGRect)
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder: Foundation.NSCoder)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor @preconcurrency open class HeaderCurveView : FormElementView {
+  @objc @IBInspectable @_Concurrency.MainActor @preconcurrency public var desiredCurve: CoreFoundation.CGFloat
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func layoutSubviews()
+  @_Concurrency.MainActor @preconcurrency public func addBottomRoundedEdge(desiredCurve: CoreFoundation.CGFloat)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public init(frame: CoreFoundation.CGRect)
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder: Foundation.NSCoder)
+  @objc deinit
+}
+extension UIKit.UIFont {
+  public static func loadFonts()
+}
+public protocol KeyValueView : UIKit.UIView {
+  var keyLabel: UIKit.UILabel { get set }
+  var valueLabel: UIKit.UILabel { get set }
+  var key: Swift.String? { get set }
+  var value: Swift.String? { get set }
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency open class HorizontalKeyValueView : FormElementView, KeyValueView {
+  @_Concurrency.MainActor @preconcurrency public var keyLabel: UIKit.UILabel
+  @_Concurrency.MainActor @preconcurrency public var valueLabel: UIKit.UILabel
+  @_Concurrency.MainActor @preconcurrency public var key: Swift.String? {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency public var value: Swift.String? {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder aDecoder: Foundation.NSCoder)
+  @objc deinit
+}
+public protocol OptionalType {
+  associatedtype Wrapped
+  static var __swifty_empty: Self { get }
+}
+#if compiler(>=5.3) && $NoncopyableGenerics
+extension Swift.Optional : OptionalType {
+  public static var __swifty_empty: Swift.Optional<Wrapped> {
+    get
+  }
+}
+#else
+extension Swift.Optional : OptionalType {
+  public static var __swifty_empty: Swift.Optional<Wrapped> {
+    get
+  }
+}
+#endif
+@objc @_inheritsConvenienceInitializers @_Concurrency.MainActor @preconcurrency public class SdkPaymentViewController : RootViewController {
+  @_Concurrency.MainActor @preconcurrency public var transactionDetails: [Swift.String : Any]
+  @_Concurrency.MainActor @preconcurrency public var statementDetails: [Swift.String : Any]
+  @_Concurrency.MainActor @preconcurrency public var isLoginFromMpin: Swift.Bool
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public func viewDidLoad()
+  @_Concurrency.MainActor @preconcurrency public func makePayment(tokenTf: Swift.String?)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public init(nibName nibNameOrNil: Swift.String?, bundle nibBundleOrNil: Foundation.Bundle?)
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder: Foundation.NSCoder)
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers open class ThemeMangerEnhance {
+  @_hasMissingDesignatedInitializers public class SpacingEnhance {
+    public static let defaultSpacing: CoreFoundation.CGFloat
+    @objc deinit
+  }
+  @_hasMissingDesignatedInitializers public class ConerRadius {
+    public static let defaultRadius: CoreFoundation.CGFloat
+    @objc deinit
+  }
+  @_hasMissingDesignatedInitializers public class Shadow {
+    @_hasMissingDesignatedInitializers public class Radius {
+      @_hasMissingDesignatedInitializers public class Umbra {
+        public static let dp1: Swift.Double
+        public static let dp2: Swift.Double
+        public static let dp3: Swift.Double
+        public static let dp4: Swift.Double
+        public static let dp6: Swift.Double
+        public static let dp8: Swift.Double
+        public static let dp9: Swift.Double
+        public static let dp12: Swift.Double
+        public static let dp16: Swift.Double
+        public static let dp24: Swift.Double
+        @objc deinit
+      }
+      @_hasMissingDesignatedInitializers public class Penumbra {
+        public static let dp1: Swift.Double
+        public static let dp2: Swift.Double
+        public static let dp3: Swift.Double
+        public static let dp4: Swift.Double
+        public static let dp6: Swift.Double
+        public static let dp8: Swift.Double
+        public static let dp9: Swift.Double
+        public static let dp12: Swift.Double
+        public static let dp16: Swift.Double
+        public static let dp24: Swift.Double
+        @objc deinit
+      }
+      @_hasMissingDesignatedInitializers public class Ambient {
+        public static let dp1: Swift.Double
+        public static let dp2: Swift.Double
+        public static let dp3: Swift.Double
+        public static let dp4: Swift.Double
+        public static let dp6: Swift.Double
+        public static let dp8: Swift.Double
+        public static let dp9: Swift.Double
+        public static let dp12: Swift.Double
+        public static let dp16: Swift.Double
+        public static let dp24: Swift.Double
+        @objc deinit
+      }
+      @objc deinit
+    }
+    @_hasMissingDesignatedInitializers public class Offset {
+      @_hasMissingDesignatedInitializers public class Umbra {
+        public static let dp1: CoreFoundation.CGSize
+        public static let dp2: CoreFoundation.CGSize
+        public static let dp3: CoreFoundation.CGSize
+        public static let dp4: CoreFoundation.CGSize
+        public static let dp6: CoreFoundation.CGSize
+        public static let dp8: CoreFoundation.CGSize
+        public static let dp9: CoreFoundation.CGSize
+        public static let dp12: CoreFoundation.CGSize
+        public static let dp16: CoreFoundation.CGSize
+        public static let dp24: CoreFoundation.CGSize
+        @objc deinit
+      }
+      @_hasMissingDesignatedInitializers public class Penumbra {
+        public static let dp1: CoreFoundation.CGSize
+        public static let dp2: CoreFoundation.CGSize
+        public static let dp3: CoreFoundation.CGSize
+        public static let dp4: CoreFoundation.CGSize
+        public static let dp6: CoreFoundation.CGSize
+        public static let dp8: CoreFoundation.CGSize
+        public static let dp9: CoreFoundation.CGSize
+        public static let dp12: CoreFoundation.CGSize
+        public static let dp16: CoreFoundation.CGSize
+        public static let dp24: CoreFoundation.CGSize
+        @objc deinit
+      }
+      @_hasMissingDesignatedInitializers public class Ambient {
+        public static let dp1: CoreFoundation.CGSize
+        public static let dp2: CoreFoundation.CGSize
+        public static let dp3: CoreFoundation.CGSize
+        public static let dp4: CoreFoundation.CGSize
+        public static let dp6: CoreFoundation.CGSize
+        public static let dp8: CoreFoundation.CGSize
+        public static let dp9: CoreFoundation.CGSize
+        public static let dp12: CoreFoundation.CGSize
+        public static let dp16: CoreFoundation.CGSize
+        public static let dp24: CoreFoundation.CGSize
+        @objc deinit
+      }
+      @objc deinit
+    }
+    @_hasMissingDesignatedInitializers public class color {
+      @_hasMissingDesignatedInitializers public class Umbra {
+        public static let color: UIKit.UIColor
+        @objc deinit
+      }
+      @_hasMissingDesignatedInitializers public class Penumbra {
+        public static let color: UIKit.UIColor
+        @objc deinit
+      }
+      @_hasMissingDesignatedInitializers public class Ambient {
+        public static let color: UIKit.UIColor
+        @objc deinit
+      }
+      @objc deinit
+    }
+    @objc deinit
+  }
+  @_hasMissingDesignatedInitializers public class EnhanchedFont {
+    public static let h1Regular: UIKit.UIFont
+    public static let h2Regular: UIKit.UIFont
+    public static let h3Regular: UIKit.UIFont
+    public static let h4Regular: UIKit.UIFont
+    public static let h5Regular: UIKit.UIFont
+    public static let h6Regular: UIKit.UIFont
+    public static let h7Regular: UIKit.UIFont
+    public static let h1RegularItalic: UIKit.UIFont
+    public static let h2RegularItalic: UIKit.UIFont
+    public static let h3RegularItalic: UIKit.UIFont
+    public static let h4RegularItalic: UIKit.UIFont
+    public static let h5RegularItalic: UIKit.UIFont
+    public static let h6RegularItalic: UIKit.UIFont
+    public static let h1Medium: UIKit.UIFont
+    public static let h2Medium: UIKit.UIFont
+    public static let h3Medium: UIKit.UIFont
+    public static let h4Medium: UIKit.UIFont
+    public static let h5Medium: UIKit.UIFont
+    public static let h6Medium: UIKit.UIFont
+    public static let h1SemiBold: UIKit.UIFont
+    public static let h2SemiBold: UIKit.UIFont
+    public static let h3SemiBold: UIKit.UIFont
+    public static let h4SemiBold: UIKit.UIFont
+    public static let h5SemiBold: UIKit.UIFont
+    public static let h6SemiBold: UIKit.UIFont
+    public static let h1Bold: UIKit.UIFont
+    public static let h2Bold: UIKit.UIFont
+    public static let h3Bold: UIKit.UIFont
+    public static let h4Bold: UIKit.UIFont
+    public static let h5Bold: UIKit.UIFont
+    public static let h6Bold: UIKit.UIFont
+    public static let bodyRegular: UIKit.UIFont
+    public static let body2Regular: UIKit.UIFont
+    public static let bodyRegularItalic: UIKit.UIFont
+    public static let body2RegularItalic: UIKit.UIFont
+    public static let bodyMedium: UIKit.UIFont
+    public static let body2Medium: UIKit.UIFont
+    public static let bodySemiBold: UIKit.UIFont
+    public static let body2SemiBold: UIKit.UIFont
+    public static let bodyBold: UIKit.UIFont
+    public static let body2Bold: UIKit.UIFont
+    public static let buttonMedium: UIKit.UIFont
+    public static let buttonMediumItalic: UIKit.UIFont
+    public static let labelMedium: UIKit.UIFont
+    public static let labelMediumItalic: UIKit.UIFont
+    public static let captionRegular: UIKit.UIFont
+    public static let captionRegularItalic: UIKit.UIFont
+    public static let captionMedium: UIKit.UIFont
+    public static let captionSemiBold: UIKit.UIFont
+    public static let captionBold: UIKit.UIFont
+    public static let overLineRegular: UIKit.UIFont
+    public static let overLineRegularItalic: UIKit.UIFont
+    public static let overLineMedium: UIKit.UIFont
+    public static let overLineSemiBold: UIKit.UIFont
+    public static let overLineBold: UIKit.UIFont
+    public static let overLine2Regular: UIKit.UIFont
+    public static let overLine2RegularItalic: UIKit.UIFont
+    public static let overLine2Medium: UIKit.UIFont
+    public static let overLine2SemiBold: UIKit.UIFont
+    public static let overLine2Bold: UIKit.UIFont
+    public static let subCaptionRegular: UIKit.UIFont
+    public static let subCaptionRegularItalic: UIKit.UIFont
+    public static let subCaptionMedium: UIKit.UIFont
+    public static let subCaptionSemiBold: UIKit.UIFont
+    public static let subCaptionBold: UIKit.UIFont
+    public static let subCaption2Regular: UIKit.UIFont
+    public static let subCaption2RegularItalic: UIKit.UIFont
+    public static let subCaption2Medium: UIKit.UIFont
+    public static let subCaption2SemiBold: UIKit.UIFont
+    public static let subCaption2Bold: UIKit.UIFont
+    @objc deinit
+  }
+  @_hasMissingDesignatedInitializers public class ColorEnchance {
+    public static let textFieldSuccessBorder: UIKit.UIColor
+    public static let textFieldSuccessBackground: UIKit.UIColor
+    public static var textFieldErrorBorder: UIKit.UIColor
+    public static let textFieldErrorBackground: UIKit.UIColor
+    public static let textFieldSuccess: UIKit.UIColor
+    public static var textFieldError: UIKit.UIColor
+    public static let textFieldBackground: UIKit.UIColor
+    public static let primaryTextDarker: UIKit.UIColor
+    public static let tertiaryText: UIKit.UIColor
+    public static let backgroundWhite: UIKit.UIColor
+    public static let backgroundColor: UIKit.UIColor
+    public static let surfaceColor: UIKit.UIColor
+    public static let onBackgroundColor: UIKit.UIColor
+    public static let onSurfaceColor: UIKit.UIColor
+    public static let onError: UIKit.UIColor
+    public static let onPrimary: UIKit.UIColor
+    public static let esewaMainColor: UIKit.UIColor
+    @_hasMissingDesignatedInitializers public class Button {
+      @_hasMissingDesignatedInitializers public class Primary {
+        public static let textButtonTextEnabled: UIKit.UIColor
+        public static let textButtonTextDisabled: UIKit.UIColor
+        public static let textButtonTextHover: UIKit.UIColor
+        public static let textButtonTextFocused: UIKit.UIColor
+        public static let textButtonTextPressed: UIKit.UIColor
+        public static let outlinedButtonTextEnabled: UIKit.UIColor
+        public static let outlinedtButtonTextDisabled: UIKit.UIColor
+        public static let outlinedButtonTextHover: UIKit.UIColor
+        public static let outlinedButtonTextFocused: UIKit.UIColor
+        public static let outlinedButtonTextPressed: UIKit.UIColor
+        public static let outlinedButtonBorderEnabled: UIKit.UIColor
+        public static let outlinedtButtonBorderDisabled: UIKit.UIColor
+        public static let outlinedButtonBorderHover: UIKit.UIColor
+        public static let outlinedButtonBorderFocused: UIKit.UIColor
+        public static let outlinedButtonBorderPressed: UIKit.UIColor
+        public static let containedButtonTextEnabled: UIKit.UIColor
+        public static let containedButtonTextDisabled: UIKit.UIColor
+        public static let containedButtonTextHover: UIKit.UIColor
+        public static let containedButtonTextFocused: UIKit.UIColor
+        public static let containedButtonTextPressed: UIKit.UIColor
+        public static let lightContainedButtonTextEnabled: UIKit.UIColor
+        public static let lightContainedButtonTextDisabled: UIKit.UIColor
+        public static let lightContainedButtonTextHover: UIKit.UIColor
+        public static let lightContainedButtonTextFocused: UIKit.UIColor
+        public static let lightContainedButtonTextPressed: UIKit.UIColor
+        public static let textButtonBackgroundEnabled: UIKit.UIColor
+        public static let textButtonBackgroundDisabled: UIKit.UIColor
+        public static let textButtonBackgroundHover: UIKit.UIColor
+        public static let textButtonBackgroundFocused: UIKit.UIColor
+        public static let textButtonBackgroundPressed: UIKit.UIColor
+        public static let outlinedButtonBackgroundEnabled: UIKit.UIColor
+        public static let outlinedButtonBackgroundDisabled: UIKit.UIColor
+        public static let outlinedButtonBackgroundHover: UIKit.UIColor
+        public static let outlinedButtonBackgroundFocused: UIKit.UIColor
+        public static let outlinedButtonBackgroundPressed: UIKit.UIColor
+        public static let containedButtonBackgroundEnabled: UIKit.UIColor
+        public static let containedButtonBackgroundDisabled: UIKit.UIColor
+        public static let containedButtonBackgroundHover: UIKit.UIColor
+        public static let containedButtonBackgroundFocused: UIKit.UIColor
+        public static let containedButtonBackgroundPressed: UIKit.UIColor
+        public static let lightContainedButtonBackgroundEnabled: UIKit.UIColor
+        public static let lightContainedButtonBackgroundDisabled: UIKit.UIColor
+        public static let lightContainedButtonBackgroundHover: UIKit.UIColor
+        public static let lightContainedButtonBackgroundFocused: UIKit.UIColor
+        public static let lightContainedButtonBackgroundPressed: UIKit.UIColor
+        public static let iconButtonBackgroundEnabled1: UIKit.UIColor
+        public static let iconButtonBackgroundEnabled3: UIKit.UIColor
+        public static let iconButtonBackgroundDisabled1: UIKit.UIColor
+        public static let iconButtonBackgroundDisabled3: UIKit.UIColor
+        public static let iconButtonBackgroundHover1: UIKit.UIColor
+        public static let iconButtonBackgroundHover2: UIKit.UIColor
+        public static let iconButtonBackgroundHover3: UIKit.UIColor
+        public static let iconButtonBackgroundHover4: UIKit.UIColor
+        public static let iconButtonBackgroundFocused1: UIKit.UIColor
+        public static let iconButtonBackgroundFocused2: UIKit.UIColor
+        public static let iconButtonBackgroundFocused3: UIKit.UIColor
+        public static let iconButtonBackgroundFocused4: UIKit.UIColor
+        public static let iconButtonBackgroundPressed1: UIKit.UIColor
+        public static let iconButtonBackgroundPressed3: UIKit.UIColor
+        public static let iconButtonBackgroundPressed4: UIKit.UIColor
+        @objc deinit
+      }
+      @_hasMissingDesignatedInitializers public class Secondary {
+        public static let textButtonTextEnabled: UIKit.UIColor
+        public static let textButtonTextDisabled: UIKit.UIColor
+        public static let textButtonTextHover: UIKit.UIColor
+        public static let textButtonTextFocused: UIKit.UIColor
+        public static let textButtonTextPressed: UIKit.UIColor
+        public static let outlinedButtonTextEnabled: UIKit.UIColor
+        public static let outlinedtButtonTextDisabled: UIKit.UIColor
+        public static let outlinedButtonTextHover: UIKit.UIColor
+        public static let outlinedButtonTextFocused: UIKit.UIColor
+        public static let outlinedButtonTextPressed: UIKit.UIColor
+        public static let outlinedButtonBorderEnabled: UIKit.UIColor
+        public static let outlinedtButtonBorderDisabled: UIKit.UIColor
+        public static let outlinedButtonBorderHover: UIKit.UIColor
+        public static let outlinedButtonBorderFocused: UIKit.UIColor
+        public static let outlinedButtonBorderPressed: UIKit.UIColor
+        public static let containedButtonTextEnabled: UIKit.UIColor
+        public static let containedButtonTextDisabled: UIKit.UIColor
+        public static let containedButtonTextHover: UIKit.UIColor
+        public static let containedButtonTextFocused: UIKit.UIColor
+        public static let containedButtonTextPressed: UIKit.UIColor
+        public static let lightContainedButtonTextEnabled: UIKit.UIColor
+        public static let lightContainedButtonTextDisabled: UIKit.UIColor
+        public static let lightContainedButtonTextHover: UIKit.UIColor
+        public static let lightContainedButtonTextFocused: UIKit.UIColor
+        public static let lightContainedButtonTextPressed: UIKit.UIColor
+        public static let textButtonBackgroundEnabled: UIKit.UIColor
+        public static let textButtonBackgroundDisabled: UIKit.UIColor
+        public static let textButtonBackgroundHover: UIKit.UIColor
+        public static let textButtonBackgroundFocused: UIKit.UIColor
+        public static let textButtonBackgroundPressed: UIKit.UIColor
+        public static let outlinedButtonBackgroundEnabled: UIKit.UIColor
+        public static let outlinedButtonBackgroundDisabled: UIKit.UIColor
+        public static let outlinedButtonBackgroundHover: UIKit.UIColor
+        public static let outlinedButtonBackgroundFocused: UIKit.UIColor
+        public static let outlinedButtonBackgroundPressed: UIKit.UIColor
+        public static let containedButtonBackgroundEnabled: UIKit.UIColor
+        public static let containedButtonBackgroundDisabled: UIKit.UIColor
+        public static let containedButtonBackgroundHover: UIKit.UIColor
+        public static let containedButtonBackgroundFocused: UIKit.UIColor
+        public static let containedButtonBackgroundPressed: UIKit.UIColor
+        public static let lightContainedButtonBackgroundEnabled: UIKit.UIColor
+        public static let lightContainedButtonBackgroundDisabled: UIKit.UIColor
+        public static let lightContainedButtonBackgroundHover: UIKit.UIColor
+        public static let lightContainedButtonBackgroundFocused: UIKit.UIColor
+        public static let lightContainedButtonBackgroundPressed: UIKit.UIColor
+        public static let iconButtonBackgroundEnabled1: UIKit.UIColor
+        public static let iconButtonBackgroundEnabled3: UIKit.UIColor
+        public static let iconButtonBackgroundDisabled1: UIKit.UIColor
+        public static let iconButtonBackgroundDisabled3: UIKit.UIColor
+        public static let iconButtonBackgroundPressed1: UIKit.UIColor
+        public static let iconButtonBackgroundPressed3: UIKit.UIColor
+        public static let iconButtonBackgroundPressed4: UIKit.UIColor
+        @objc deinit
+      }
+      @objc deinit
+    }
+    public static let successCardBackground: UIKit.UIColor
+    public static let successCardText: UIKit.UIColor
+    public static let warningCardBackground: UIKit.UIColor
+    public static let warningCardText: UIKit.UIColor
+    public static let infoCardBackground: UIKit.UIColor
+    public static let infoCardText: UIKit.UIColor
+    public static let errorCardBackground: UIKit.UIColor
+    public static let errorCardText: UIKit.UIColor
+    public static let cardBackground: UIKit.UIColor
+    public static let cardTitleText: UIKit.UIColor
+    public static let cardSubtitleText: UIKit.UIColor
+    public static let cardContentText: UIKit.UIColor
+    public static let cardSurfaceBackground: UIKit.UIColor
+    public static let cardHighlightText: UIKit.UIColor
+    public static let cardSubitemBorder: UIKit.UIColor
+    public static let datepickerBackground: UIKit.UIColor
+    public static let datepickerSelectedDate: UIKit.UIColor
+    public static let datepickerSecondary: UIKit.UIColor
+    public static let cellItemBackground: UIKit.UIColor
+    public static let cellItemTitleText: UIKit.UIColor
+    public static let cellItmeSubtitleText: UIKit.UIColor
+    public static let cellItemSelectedBackground: UIKit.UIColor
+    public static let cellItemSelectedTitleText: UIKit.UIColor
+    public static let cellItemHoverBackground: UIKit.UIColor
+    public static let bottomSheetBackground: UIKit.UIColor
+    public static let bottomSheetTitleText: UIKit.UIColor
+    public static let bottomSheetContentText: UIKit.UIColor
+    public static let sliderEnabled: UIKit.UIColor
+    public static let sliderEnabledTint: UIKit.UIColor
+    public static let sliderDisabled: UIKit.UIColor
+    public static let sliderDisabledTint: UIKit.UIColor
+    public static let switchButtonOn: UIKit.UIColor
+    public static let switchButtonOff: UIKit.UIColor
+    public static let tabSelected: UIKit.UIColor
+    public static let tabUnselected: UIKit.UIColor
+    public static let tabSelectedFilledBackground: UIKit.UIColor
+    public static let tabSelectedFilledText: UIKit.UIColor
+    public static let tabUnselectedFilledBackground: UIKit.UIColor
+    public static let tabUnselectedFilledText: UIKit.UIColor
+    public static let scrollTabSelectedFilledBackground: UIKit.UIColor
+    public static let scrollTabSelectedFilledText: UIKit.UIColor
+    public static let scrollTabUnselectedFilledBackground: UIKit.UIColor
+    public static let scrollTabUnselectedFilledText: UIKit.UIColor
+    public static let scrollTabSelectedText: UIKit.UIColor
+    public static let scrollTabUnselectedText: UIKit.UIColor
+    public static let rewardPointBackground1: UIKit.UIColor
+    public static let rewardPointText1: UIKit.UIColor
+    public static let rewardPointBackground2: UIKit.UIColor
+    public static let rewardPointText2: UIKit.UIColor
+    public static let rewardPointBackground3: UIKit.UIColor
+    public static let rewardPointText3: UIKit.UIColor
+    public static let expiredBackground: UIKit.UIColor
+    public static let expiredText: UIKit.UIColor
+    public static let earnedBackground: UIKit.UIColor
+    public static let earnedText: UIKit.UIColor
+    public static let redeemedBackground: UIKit.UIColor
+    public static let redeemedText: UIKit.UIColor
+    public static let activeBackground: UIKit.UIColor
+    public static let cancelledBackground: UIKit.UIColor
+    public static let cancelledText: UIKit.UIColor
+    public static let completeBackground: UIKit.UIColor
+    public static let completeText: UIKit.UIColor
+    public static let ambigiousBackground: UIKit.UIColor
+    public static let ambigiousText: UIKit.UIColor
+    public static let pendingBackground: UIKit.UIColor
+    public static let pendingText: UIKit.UIColor
+    public static let inProcessBackground: UIKit.UIColor
+    public static let inProcessText: UIKit.UIColor
+    public static let approvedBackground: UIKit.UIColor
+    public static let approvedText: UIKit.UIColor
+    public static let unverifiedBackground: UIKit.UIColor
+    public static let unverifiedText: UIKit.UIColor
+    public static let incompleteBackground: UIKit.UIColor
+    public static let incompleteText: UIKit.UIColor
+    public static let uploadCardBackground: UIKit.UIColor
+    public static let uploadCardFailureBackground: UIKit.UIColor
+    public static let uploadTitleText: UIKit.UIColor
+    public static let uploadContentText: UIKit.UIColor
+    public static let uploadSuccessInfoText: UIKit.UIColor
+    public static let uploadFailureInfoText: UIKit.UIColor
+    public static var background: UIKit.UIColor {
+      get
+    }
+    public static var onBackground: UIKit.UIColor {
+      get
+    }
+    public static var surfaceBG: UIKit.UIColor {
+      get
+    }
+    public static var onSurface: UIKit.UIColor {
+      get
+    }
+    public static var primaryGreen50: UIKit.UIColor {
+      get
+    }
+    public static var primaryGreen100: UIKit.UIColor {
+      get
+    }
+    public static var primaryGreen200: UIKit.UIColor {
+      get
+    }
+    public static var primaryGreen300: UIKit.UIColor {
+      get
+    }
+    public static var primaryGreen400: UIKit.UIColor {
+      get
+    }
+    public static var primaryGreen500: UIKit.UIColor {
+      get
+    }
+    public static var primaryGreen600: UIKit.UIColor {
+      get
+    }
+    public static var primaryGreen700: UIKit.UIColor {
+      get
+    }
+    public static var primaryGreen800: UIKit.UIColor {
+      get
+    }
+    public static var primaryGreen900: UIKit.UIColor {
+      get
+    }
+    public static var primaryError50: UIKit.UIColor {
+      get
+    }
+    public static var primaryError100: UIKit.UIColor {
+      get
+    }
+    public static var primaryError200: UIKit.UIColor {
+      get
+    }
+    public static var primaryError300: UIKit.UIColor {
+      get
+    }
+    public static var primaryError400: UIKit.UIColor {
+      get
+    }
+    public static var primaryError500: UIKit.UIColor {
+      get
+    }
+    public static var primaryError600: UIKit.UIColor {
+      get
+    }
+    public static var primaryError700: UIKit.UIColor {
+      get
+    }
+    public static var primaryError800: UIKit.UIColor {
+      get
+    }
+    public static var primaryError900: UIKit.UIColor {
+      get
+    }
+    public static var primaryInfo50: UIKit.UIColor {
+      get
+    }
+    public static var primaryInfo100: UIKit.UIColor {
+      get
+    }
+    public static var primaryInfo200: UIKit.UIColor {
+      get
+    }
+    public static var primaryInfo300: UIKit.UIColor {
+      get
+    }
+    public static var primaryInfo400: UIKit.UIColor {
+      get
+    }
+    public static var primaryInfo500: UIKit.UIColor {
+      get
+    }
+    public static var primaryInfo600: UIKit.UIColor {
+      get
+    }
+    public static var primaryInfo700: UIKit.UIColor {
+      get
+    }
+    public static var primaryInfo800: UIKit.UIColor {
+      get
+    }
+    public static var primaryWarning50: UIKit.UIColor {
+      get
+    }
+    public static var primaryWarning100: UIKit.UIColor {
+      get
+    }
+    public static var primaryWarning200: UIKit.UIColor {
+      get
+    }
+    public static var primaryWarning300: UIKit.UIColor {
+      get
+    }
+    public static var primaryWarning400: UIKit.UIColor {
+      get
+    }
+    public static var primaryWarning500: UIKit.UIColor {
+      get
+    }
+    public static var primaryWarning600: UIKit.UIColor {
+      get
+    }
+    public static var primaryWarning700: UIKit.UIColor {
+      get
+    }
+    public static var primaryWarning800: UIKit.UIColor {
+      get
+    }
+    public static var primaryWarning900: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutral50: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutral100: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutral200: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutral300: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutral400: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutral500: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutral600: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutral700: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutral800: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutral900: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutralVariant50: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutralVariant100: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutralVariant200: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutralVariant300: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutralVariant400: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutralVariant500: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutralVariant600: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutralVariant700: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutralVariant800: UIKit.UIColor {
+      get
+    }
+    public static var primaryNeutralVariant900: UIKit.UIColor {
+      get
+    }
+    public static var primaryGrayscale50: UIKit.UIColor {
+      get
+    }
+    public static var primaryGrayscale100: UIKit.UIColor {
+      get
+    }
+    public static var primaryGrayscale200: UIKit.UIColor {
+      get
+    }
+    public static var primaryGrayscale300: UIKit.UIColor {
+      get
+    }
+    public static var primaryGrayscale400: UIKit.UIColor {
+      get
+    }
+    public static var primaryGrayscale500: UIKit.UIColor {
+      get
+    }
+    public static var primaryGrayscale600: UIKit.UIColor {
+      get
+    }
+    public static var primaryGrayscale700: UIKit.UIColor {
+      get
+    }
+    public static var primaryGrayscale800: UIKit.UIColor {
+      get
+    }
+    public static var primaryGrayscale900: UIKit.UIColor {
+      get
+    }
+    public static var bodyBG: UIKit.UIColor {
+      get
+    }
+    public static var bodyColor: UIKit.UIColor {
+      get
+    }
+    public static var primary: UIKit.UIColor {
+      get
+    }
+    public static var primaryDark: UIKit.UIColor {
+      get
+    }
+    public static var primaryBGLight: UIKit.UIColor {
+      get
+    }
+    public static var primaryText: UIKit.UIColor {
+      get
+    }
+    public static var primaryLightText: UIKit.UIColor {
+      get
+    }
+    public static var primaryMuted: UIKit.UIColor {
+      get
+    }
+    public static var secondary: UIKit.UIColor {
+      get
+    }
+    public static var secondaryBGLight: UIKit.UIColor {
+      get
+    }
+    public static var secondaryBorder: UIKit.UIColor {
+      get
+    }
+    public static var secondaryText: UIKit.UIColor {
+      get
+    }
+    public static var secondaryTextLight: UIKit.UIColor {
+      get
+    }
+    public static var secondaryMuted: UIKit.UIColor {
+      get
+    }
+    public static var info: UIKit.UIColor {
+      get
+    }
+    public static var infoBGLight: UIKit.UIColor {
+      get
+    }
+    public static var infoBorder: UIKit.UIColor {
+      get
+    }
+    public static var infoText: UIKit.UIColor {
+      get
+    }
+    public static var success: UIKit.UIColor {
+      get
+    }
+    public static var successBGLight: UIKit.UIColor {
+      get
+    }
+    public static var successBorder: UIKit.UIColor {
+      get
+    }
+    public static var successText: UIKit.UIColor {
+      get
+    }
+    public static var danger: UIKit.UIColor {
+      get
+    }
+    public static var dangerBGLight: UIKit.UIColor {
+      get
+    }
+    public static var dangerBorder: UIKit.UIColor {
+      get
+    }
+    public static var dangerText: UIKit.UIColor {
+      get
+    }
+    public static var warning: UIKit.UIColor {
+      get
+    }
+    public static var warningBGLight: UIKit.UIColor {
+      get
+    }
+    public static var warningBorder: UIKit.UIColor {
+      get
+    }
+    public static var warningText: UIKit.UIColor {
+      get
+    }
+    public static var white: UIKit.UIColor {
+      get
+    }
+    public static var black: UIKit.UIColor {
+      get
+    }
+    public static var inputBG: UIKit.UIColor {
+      get
+    }
+    public static var inputPlaceholder: UIKit.UIColor {
+      get
+    }
+    public static var inputDisabledBG: UIKit.UIColor {
+      get
+    }
+    public static var border: UIKit.UIColor {
+      get
+    }
+    public static var appbarBGTool: UIKit.UIColor {
+      get
+    }
+    public static var appbarBGTop: UIKit.UIColor {
+      get
+    }
+    public static var appbarBGBottom: UIKit.UIColor {
+      get
+    }
+    public static var iconGreen: UIKit.UIColor {
+      get
+    }
+    public static var iconGreenLight: UIKit.UIColor {
+      get
+    }
+    public static var iconGray: UIKit.UIColor {
+      get
+    }
+    public static var iconBG: UIKit.UIColor {
+      get
+    }
+    public static var iconMuted: UIKit.UIColor {
+      get
+    }
+    public static var textDark: UIKit.UIColor {
+      get
+    }
+    public static var textTertiary: UIKit.UIColor {
+      get
+    }
+    public static var textLight: UIKit.UIColor {
+      get
+    }
+    public static var textMuted: UIKit.UIColor {
+      get
+    }
+    public static var cardBG: UIKit.UIColor {
+      get
+    }
+    public static var balanceBG: UIKit.UIColor {
+      get
+    }
+    public static var balanceBGLightGray: UIKit.UIColor {
+      get
+    }
+    public static var profileBalanceCardBG: UIKit.UIColor {
+      get
+    }
+    public static var modalBackdropBG: UIKit.UIColor {
+      get
+    }
+    public static var buttonMutedBG: UIKit.UIColor {
+      get
+    }
+    public static var buttonMuted: UIKit.UIColor {
+      get
+    }
+    public static var linearGradientStart: UIKit.UIColor {
+      get
+    }
+    public static var linearGradientEnd: UIKit.UIColor {
+      get
+    }
+    public static var atmWithdrawCompletedStatus: UIKit.UIColor {
+      get
+    }
+    public static var atmWithdrawCompletedTitle: UIKit.UIColor {
+      get
+    }
+    @objc deinit
+  }
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers open class Shape {
+  @_hasMissingDesignatedInitializers public class Radius {
+    public static var buttonSmallRadius: CoreFoundation.CGFloat {
+      get
+    }
+    public static var buttonLargeRadius: CoreFoundation.CGFloat {
+      get
+    }
+    public static var bottomSheetLargeRadius: CoreFoundation.CGFloat {
+      get
+    }
+    public static var chipSmallRadius: CoreFoundation.CGFloat {
+      get
+    }
+    public static var fabSmallRadius: CoreFoundation.CGFloat {
+      get
+    }
+    public static var cardMediumRadius: CoreFoundation.CGFloat {
+      get
+    }
+    public static var dialogMediumRadius: CoreFoundation.CGFloat {
+      get
+    }
+    public static var imageListItemMediumRadius: CoreFoundation.CGFloat {
+      get
+    }
+    public static var menuMediumRadius: CoreFoundation.CGFloat {
+      get
+    }
+    public static var standardBottomSheetLargeRadius: CoreFoundation.CGFloat {
+      get
+    }
+    public static var filledTextFieldSmallRadius: CoreFoundation.CGFloat {
+      get
+    }
+    public static var snackBarSmallRadius: CoreFoundation.CGFloat {
+      get
+    }
+    public static var tolTipsSmallRadius: CoreFoundation.CGFloat {
+      get
+    }
+    public class func roundedRadius(heightOfView: CoreFoundation.CGFloat) -> CoreFoundation.CGFloat
+    @objc deinit
+  }
+  @_hasMissingDesignatedInitializers public class Margin {
+    public static var sdp0: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp1: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp2: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp4: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp6: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp8: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp10: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp12: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp14: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp16: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp18: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp20: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp24: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp26: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp28: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp30: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp32: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp36: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp40: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp42: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp44: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp46: CoreFoundation.CGFloat {
+      get
+    }
+    @objc deinit
+  }
+  @_hasMissingDesignatedInitializers public class ImageHeight {
+    public static var sdp12: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp16: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp20: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp24: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp28: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp32: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp36: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp44: CoreFoundation.CGFloat {
+      get
+    }
+    @objc deinit
+  }
+  @_hasMissingDesignatedInitializers public class ImageWidth {
+    public static var sdp12: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp16: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp20: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp24: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp28: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp32: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp36: CoreFoundation.CGFloat {
+      get
+    }
+    public static var sdp44: CoreFoundation.CGFloat {
+      get
+    }
+    @objc deinit
+  }
+  @objc deinit
+}
+public var Defaults: DefaultsAdapter<DefaultsKeys>
+extension Foundation.UserDefaults {
+  public func hasKey<T>(_ key: DefaultsKey<T>) -> Swift.Bool where T : DefaultsSerializable
+  public func remove<T>(_ key: DefaultsKey<T>) where T : DefaultsSerializable
+  public func removeAll()
+}
+public enum ReachabilityError : Swift.Error {
+  case FailedToCreateWithAddress(Darwin.sockaddr_in)
+  case FailedToCreateWithHostname(Swift.String)
+  case UnableToSetCallback
+  case UnableToSetDispatchQueue
+}
+public let ReachabilityChangedNotification: Foundation.NSNotification.Name
+public class Reachability {
+  public typealias NetworkReachable = (Reachability) -> ()
+  public typealias NetworkUnreachable = (Reachability) -> ()
+  public enum NetworkStatus : Swift.CustomStringConvertible {
+    case notReachable, reachableViaWiFi, reachableViaWWAN
+    public var description: Swift.String {
+      get
+    }
+    public static func == (a: Reachability.NetworkStatus, b: Reachability.NetworkStatus) -> Swift.Bool
+    public func hash(into hasher: inout Swift.Hasher)
+    public var hashValue: Swift.Int {
+      get
+    }
+  }
+  public var whenReachable: Reachability.NetworkReachable?
+  public var whenUnreachable: Reachability.NetworkUnreachable?
+  public var reachableOnWWAN: Swift.Bool
+  public var notificationCenter: Foundation.NotificationCenter
+  public var currentReachabilityString: Swift.String {
+    get
+  }
+  public var currentReachabilityStatus: Reachability.NetworkStatus {
+    get
+  }
+  required public init(reachabilityRef: SystemConfiguration.SCNetworkReachability)
+  convenience public init?(hostname: Swift.String)
+  convenience public init?()
+  @objc deinit
+}
+extension Reachability {
+  public func startNotifier() throws
+  public func stopNotifier()
+  public var isReachable: Swift.Bool {
+    get
+  }
+  public var isReachableViaWWAN: Swift.Bool {
+    get
+  }
+  public var isReachableViaWiFi: Swift.Bool {
+    get
+  }
+  public var description: Swift.String {
+    get
+  }
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency open class SMSegment : UIKit.UIView {
+  @_Concurrency.MainActor @preconcurrency public var title: Swift.String? {
+    get
+    set
+  }
+  @_Concurrency.MainActor @preconcurrency open var onSelectionImage: UIKit.UIImage?
+  @_Concurrency.MainActor @preconcurrency open var offSelectionImage: UIKit.UIImage?
+  @_Concurrency.MainActor @preconcurrency open var appearance: SMSegmentAppearance?
+  @_Concurrency.MainActor @preconcurrency @objc required dynamic public init?(coder aDecoder: Foundation.NSCoder)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public init(frame: CoreFoundation.CGRect)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func layoutSubviews()
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func touchesBegan(_ touches: Swift.Set<UIKit.UITouch>, with event: UIKit.UIEvent?)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func touchesEnded(_ touches: Swift.Set<UIKit.UITouch>, with event: UIKit.UIEvent?)
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic open func touchesCancelled(_ touches: Swift.Set<UIKit.UITouch>, with event: UIKit.UIEvent?)
+  @objc deinit
+}
+extension UIKit.UIDevice {
+  @_Concurrency.MainActor @preconcurrency public var modelName: Swift.String {
+    get
+  }
+}
+extension ValidationType : Swift.Equatable {}
+extension ValidationType : Swift.Hashable {}
+extension FormTokenValidator : Swift.Sendable {}
+extension EsewaSDKEnvironment : Swift.Equatable {}
+extension EsewaSDKEnvironment : Swift.Hashable {}
+extension EsewaSDKEnvironment : Swift.RawRepresentable {}
+extension UIKit.UIDevice.DeviceType : Swift.Equatable {}
+extension UIKit.UIDevice.DeviceType : Swift.Hashable {}
+extension UIKit.UIDevice.DeviceType : Swift.RawRepresentable {}
+extension SMSegmentOrganiseMode : Swift.Equatable {}
+extension SMSegmentOrganiseMode : Swift.Hashable {}
+extension SMSegmentOrganiseMode : Swift.RawRepresentable {}
+extension SMSTitleGravity : Swift.Equatable {}
+extension SMSTitleGravity : Swift.Hashable {}
+extension Reachability.NetworkStatus : Swift.Equatable {}
+extension Reachability.NetworkStatus : Swift.Hashable {}

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Imported automatically into any project that references the esewa_maui
+  NuGet package on an iOS target framework. It re-declares the native
+  frameworks as NativeReferences so the consuming app links and embeds them.
+  ($(MSBuildThisFileDirectory) points at buildTransitive/net10.0-ios/ inside
+  the extracted package.)
+-->
+<Project>
+
+  <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
+
+    <!-- Dynamic Swift framework: embedded + signed into the app bundle.
+         No ForceLoad (only valid for static archives). -->
+    <NativeReference Include="$(MSBuildThisFileDirectory)EsewaSDK.xcframework">
+      <Kind>Framework</Kind>
+      <SmartLink>True</SmartLink>
+      <Frameworks>UIKit Foundation CoreFoundation</Frameworks>
+    </NativeReference>
+
+    <!-- Static @objc shim framework that re-exposes the Swift-only payment API. -->
+    <NativeReference Include="$(MSBuildThisFileDirectory)EsewaBridge.xcframework"
+                     Condition="Exists('$(MSBuildThisFileDirectory)EsewaBridge.xcframework')">
+      <Kind>Framework</Kind>
+      <ForceLoad>True</ForceLoad>
+      <SmartLink>True</SmartLink>
+      <Frameworks>UIKit Foundation</Frameworks>
+    </NativeReference>
+
+  </ItemGroup>
+
+  <!-- Fail early with a clear message if the shim was never built. -->
+  <Target Name="_EsewaVerifyShim"
+          Condition="$(TargetFramework.Contains('-ios'))"
+          BeforeTargets="_ParseNativeReferences;Build">
+    <Warning Condition="!Exists('$(MSBuildThisFileDirectory)EsewaBridge.xcframework')"
+             Text="esewa_maui: EsewaBridge.xcframework is missing from the package. The iOS payment API will not link. Rebuild the package on macOS after running Native/Shim/build-shim.sh." />
+  </Target>
+
+</Project>

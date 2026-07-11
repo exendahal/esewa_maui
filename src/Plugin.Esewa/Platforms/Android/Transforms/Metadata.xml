@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <!--
+    The eSewa release AAR is R8-obfuscated. Only the documented public
+    entry points need to be surfaced to managed code; everything else is
+    internal plumbing. We keep the public API package and drop the
+    obfuscated single-letter helper packages that the binding generator
+    cannot resolve cleanly.
+  -->
+
+  <!-- Give the SDK package a friendlier managed namespace. -->
+  <attr path="/api/package[@name='com.f1soft.esewapaymentsdk']"
+        name="managedName">Com.F1soft.Esewapaymentsdk</attr>
+
+  <!-- The ESEWA_CONFIGURATION / ESEWA_PAYMENT string constants would each
+       generate a C# member whose name matches its enclosing type, which is
+       illegal. Rename them. (We reference the raw values from managed code
+       anyway, so these names are only for completeness.) -->
+  <attr path="/api/package[@name='com.f1soft.esewapaymentsdk']/class[@name='EsewaConfiguration']/field[@name='ESEWA_CONFIGURATION']"
+        name="managedName">ExtraConfigurationKey</attr>
+  <attr path="/api/package[@name='com.f1soft.esewapaymentsdk']/class[@name='EsewaPayment']/field[@name='ESEWA_PAYMENT']"
+        name="managedName">ExtraPaymentKey</attr>
+
+  <!-- Drop the obfuscated Kotlin `Companion` fields the generator cannot
+       resolve (type `c.a`); they are not part of the usable API. -->
+  <remove-node path="/api/package[@name='com.f1soft.esewapaymentsdk.dto']/class[@name='LoginResponseDto']/field[@name='Companion']" />
+</metadata>

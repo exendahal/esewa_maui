@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="EsewaSample.MainPage"
+             Title="eSewa MAUI Demo">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
+
+            <Label Text="eSewa Payment Demo"
+                   Style="{StaticResource Headline}"
+                   SemanticProperties.HeadingLevel="Level1" />
+
+            <Label Text="Fill in the payment details and tap Pay to launch the native eSewa SDK."
+                   Style="{StaticResource SubHeadline}" />
+
+            <Entry x:Name="AmountEntry" Placeholder="Amount (e.g. 100)" Text="100" Keyboard="Numeric" />
+            <Entry x:Name="ProductNameEntry" Placeholder="Product name" Text="Test Product" />
+            <Entry x:Name="ProductIdEntry" Placeholder="Product / transaction id" Text="TXN-001" />
+
+            <Button x:Name="PayButton"
+                    Text="Pay with eSewa"
+                    Clicked="OnPayClicked"
+                    HorizontalOptions="Fill" />
+
+            <ActivityIndicator x:Name="Busy" IsRunning="False" IsVisible="False" />
+
+            <Border x:Name="ResultFrame" IsVisible="False" Padding="16"
+                    Stroke="#DDD" StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8">
+                <VerticalStackLayout Spacing="6">
+                    <Label x:Name="ResultStatus" FontAttributes="Bold" FontSize="18" />
+                    <Label x:Name="ResultMessage" />
+                    <Label x:Name="ResultDetails" FontSize="12" TextColor="Gray" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

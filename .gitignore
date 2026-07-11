@@ -1,0 +1,20 @@
+## .NET / MAUI build output
+[Bb]in/
+[Oo]bj/
+*.user
+*.binlog
+
+## NuGet pack output
+nupkg/
+*.nupkg
+*.snupkg
+
+## Rider / VS
+.idea/
+.vs/
+
+## Shim intermediate build output (macOS)
+src/Plugin.Esewa/Native/Shim/.build/
+
+## The shim xcframework is a build artifact produced on macOS by build-shim.sh
+src/Plugin.Esewa/Native/EsewaBridge.xcframework/

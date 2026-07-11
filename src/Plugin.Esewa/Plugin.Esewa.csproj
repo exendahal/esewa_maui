@@ -1,0 +1,167 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net10.0-android;net10.0-ios</TargetFrameworks>
+    <SupportedOSPlatformVersion Condition="$(TargetFramework.Contains('-android'))">21.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$(TargetFramework.Contains('-ios'))">13.0</SupportedOSPlatformVersion>
+
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Plugin.Esewa</RootNamespace>
+    <AssemblyName>Plugin.Esewa</AssemblyName>
+
+    <!-- Pulls in Microsoft.Maui.ApplicationModel.Platform (CurrentActivity,
+         current UIViewController helpers). -->
+    <UseMauiEssentials>true</UseMauiEssentials>
+
+    <!-- Enable the Objective-C binding generator for the iOS target so the
+         ObjcBindingApiDefinition items are turned into managed types. -->
+    <IsBindingProject Condition="$(TargetFramework.Contains('-ios'))">true</IsBindingProject>
+
+    <!-- We manage cross-platform item inclusion by hand so that platform
+         folders and binding definition files only compile on their platform. -->
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultAndroidItems>false</EnableDefaultAndroidItems>
+
+    <!-- Silence known binding-generator warnings for the obfuscated
+         release AAR (unresolved internal base types are hidden below).
+         CS1591 = missing XML doc on public members (docs are generated). -->
+    <NoWarn>$(NoWarn);BG8102;BG8103;BG8401;BG8604;BG8605;BG8606;CS0618;CS1591</NoWarn>
+  </PropertyGroup>
+
+  <!-- ==================== NuGet package metadata ==================== -->
+  <PropertyGroup>
+    <PackageId>esewa_maui</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>exendahal</Authors>
+    <Company>Santosh Dahal</Company>
+    <Product>esewa_maui</Product>
+    <Title>esewa_maui — eSewa payments for .NET MAUI</Title>
+    <Description>
+      .NET MAUI bindings for the native eSewa payment SDKs on Android and iOS.
+      Exposes a single cross-platform API — CrossEsewaPayment.Current.PayAsync(...) —
+      that launches the native eSewa checkout and returns a normalized result.
+    </Description>
+    <PackageTags>esewa;maui;dotnet-maui;payment;payments;android;ios;binding;nepal;fintech;esewa-sdk</PackageTags>
+    <Copyright>Santosh Dahal</Copyright>
+    <PackageProjectUrl>https://github.com/exendahal/esewa_maui</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/exendahal/esewa_maui</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>Initial release: Android (AAR binding) and iOS (Swift xcframework via @objc shim) support.</PackageReleaseNotes>
+
+    <!-- Build artifacts included in the package -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+    <!-- Produce the .nupkg with `dotnet pack`, not on every build. -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <!-- ==================== Shared (all platforms) ==================== -->
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.20" />
+  </ItemGroup>
+
+  <!-- Package the repo README and icon into the NuGet package root. -->
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="icon.png" Pack="true" PackagePath="\" Visible="false" />
+  </ItemGroup>
+
+  <!-- ==================== Android ==================== -->
+  <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
+    <Compile Include="Platforms\Android\**\*.cs" />
+
+    <!-- Bind the native eSewa payment AAR -->
+    <AndroidLibrary Include="Native\eSewaPaymentSdk.aar" Bind="true" />
+
+    <!-- Metadata transforms applied to the generated binding -->
+    <TransformFile Include="Platforms\Android\Transforms\Metadata.xml" />
+
+    <!-- Runtime dependencies the native SDK needs but that a MAUI app does
+         not already provide transitively. AppCompat, Material, Core and
+         Lifecycle come from MAUI itself; the packages below are the ones the
+         SDK references that would otherwise be missing from the APK:
+           - Kotlin stdlib   : Kotlin types appear in the SDK signatures.
+           - ViewBinding     : the SDK's screens use androidx.viewbinding.
+           - ConstraintLayout: used by the SDK's layouts.
+           - OkHttp3 (+ logging interceptor): the SDK's networking stack,
+                               not bundled in the AAR. -->
+    <PackageReference Include="Xamarin.Kotlin.StdLib" Version="2.3.10.1" />
+    <PackageReference Include="Xamarin.AndroidX.DataBinding.ViewBinding" Version="7.4.2" />
+    <PackageReference Include="Xamarin.AndroidX.ConstraintLayout" Version="2.2.1.3" />
+    <PackageReference Include="Square.OkHttp3" Version="4.12.0" />
+    <PackageReference Include="Square.OkHttp3.LoggingInterceptor" Version="4.12.0" />
+  </ItemGroup>
+
+  <!-- ==================== iOS ==================== -->
+  <ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
+    <Compile Include="Platforms\iOS\EsewaPayment.ios.cs" />
+
+    <!-- Managed binding definitions for the @objc surface: the delegate
+         protocol from EsewaSDK.xcframework plus the EsewaBridge shim. -->
+    <ObjcBindingApiDefinition Include="Platforms\iOS\ApiDefinition.cs" />
+
+    <!-- The native Swift SDK. It is a *dynamic* framework, so it is embedded
+         and signed into the app bundle (Kind=Framework). No ForceLoad here:
+         -force_load is only valid for static archives and would break the
+         link against a dynamic framework. Its Swift runtime dependencies
+         (libswiftCore, etc.) are ABI-stable and provided by iOS 12.2+. -->
+    <NativeReference Include="Native\EsewaSDK.xcframework">
+      <Kind>Framework</Kind>
+      <SmartLink>True</SmartLink>
+      <Frameworks>UIKit Foundation CoreFoundation</Frameworks>
+    </NativeReference>
+
+    <!-- The @objc Swift shim that re-exposes the Swift-only payment API.
+         Build it on macOS first with Native/Shim/build-shim.sh (see README).
+         It is a *static* framework, so ForceLoad keeps its (indirectly used)
+         symbols. Guarded on Exists() so the managed assembly still
+         restores/builds on Windows; the framework is required at app link
+         time (which happens on a Mac for iOS anyway). -->
+    <NativeReference Include="Native\EsewaBridge.xcframework"
+                     Condition="Exists('Native\EsewaBridge.xcframework')">
+      <Kind>Framework</Kind>
+      <ForceLoad>True</ForceLoad>
+      <SmartLink>True</SmartLink>
+      <Frameworks>UIKit Foundation</Frameworks>
+    </NativeReference>
+  </ItemGroup>
+
+  <!-- ==================== iOS NuGet packaging ====================
+       Unlike the Android AAR (which is embedded into the managed assembly and
+       flows to consumers automatically), iOS native frameworks are NOT
+       embedded. So we pack the xcframeworks plus a buildTransitive .targets
+       that re-declares the NativeReferences in the *consuming* app, resolving
+       the frameworks relative to the package. The .targets file name matches
+       the PackageId so NuGet imports it automatically.
+
+       NOTE: these are intentionally NOT conditioned on $(TargetFramework).
+       `Pack="true"` items are collected in the outer, TargetFramework-less
+       build, where an -ios condition would evaluate to false and silently
+       drop them. The PackagePath already scopes them to iOS consumers. -->
+  <ItemGroup>
+    <None Include="buildTransitive\esewa_maui.targets"
+          Pack="true" PackagePath="buildTransitive\esewa_maui.targets" Visible="false" />
+
+    <None Include="Native\EsewaSDK.xcframework\**"
+          Pack="true"
+          PackagePath="buildTransitive\EsewaSDK.xcframework\%(RecursiveDir)%(Filename)%(Extension)"
+          Visible="false" />
+
+    <None Include="Native\EsewaBridge.xcframework\**"
+          Condition="Exists('Native\EsewaBridge.xcframework')"
+          Pack="true"
+          PackagePath="buildTransitive\EsewaBridge.xcframework\%(RecursiveDir)%(Filename)%(Extension)"
+          Visible="false" />
+  </ItemGroup>
+
+</Project>
