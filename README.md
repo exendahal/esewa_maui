@@ -1,5 +1,4 @@
 [![NuGet](https://img.shields.io/nuget/v/esewa_maui.svg?label=NuGet)](https://www.nuget.org/packages/esewa_maui/)
-[![Downloads](https://img.shields.io/nuget/dt/esewa_maui.svg)](https://www.nuget.org/packages/esewa_maui/)
 
 Accept **eSewa** payments in your .NET MAUI app with a single, async call.
 `esewa_maui` wraps the official native eSewa SDKs on **Android** and **iOS** and
