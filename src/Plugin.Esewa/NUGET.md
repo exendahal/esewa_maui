@@ -20,10 +20,6 @@ if (result.IsSuccess)
     await DisplayAlert("Success", result.Message, "OK");
 ```
 
-## Preview
-
-<img src="preview/android.png" alt="esewa_maui payment screen on Android" width="280" />
-
 ## Requirements
 
 | | |
@@ -136,14 +132,9 @@ URL** from eSewa. Sign up and manage these on the official developer portal:
 Use `EsewaEnvironment.Test` with sandbox credentials during development, then
 switch to `EsewaEnvironment.Production` with your live credentials to go live.
 
-## Example app
-
-A complete working sample is in [`samples/EsewaSample`](samples/EsewaSample) —
-a MAUI app that collects payment details and calls `PayAsync` from a button.
-
 ## License
 
-Released under the **MIT License** — see [LICENSE](LICENSE).
+Released under the **MIT License**.
 
 > The MIT license covers this plugin. The bundled native eSewa SDKs are the
 > property of eSewa and are subject to eSewa's own licensing terms; see

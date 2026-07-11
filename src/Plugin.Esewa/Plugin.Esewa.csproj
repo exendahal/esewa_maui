@@ -70,9 +70,12 @@
     <PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.20" />
   </ItemGroup>
 
-  <!-- Package the repo README and icon into the NuGet package root. -->
+  <!-- Package readme + icon into the NuGet package root. NUGET.md is a
+       package-specific readme (no repo-only screenshots); it is packed as
+       README.md, which PackageReadmeFile points at. The repo's own README.md
+       keeps the GitHub-only preview image. -->
   <ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="NUGET.md" Pack="true" PackagePath="README.md" Visible="false" />
     <None Include="icon.png" Pack="true" PackagePath="\" Visible="false" />
   </ItemGroup>
 
