@@ -17,7 +17,7 @@ public partial class MainPage : ContentPage
 
     async void OnPayClicked(object? sender, EventArgs e)
     {
-        if (!CrossEsewaPayment.IsSupported)
+        if (!EsewaPayment.IsSupported)
         {
             await DisplayAlertAsync("Unsupported", "eSewa payments are only available on Android and iOS.", "OK");
             return;
@@ -40,7 +40,7 @@ public partial class MainPage : ContentPage
             };
 
             // The one call the whole plugin exists for:
-            EsewaPaymentResult result = await CrossEsewaPayment.Current.PayAsync(request);
+            EsewaPaymentResult result = await EsewaPayment.Current.PayAsync(request);
 
             ShowResult(result);
         }

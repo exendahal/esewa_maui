@@ -2,6 +2,7 @@ using Android.App;
 using Android.Content;
 using Android.OS;
 using Com.F1soft.Esewapaymentsdk;
+using NativeEsewaPayment = Com.F1soft.Esewapaymentsdk.EsewaPayment;
 
 namespace Plugin.Esewa;
 
@@ -111,7 +112,7 @@ sealed class EsewaLauncherActivity : Activity
                     properties[key] = bundle.GetString(key) ?? string.Empty;
             }
 
-            var payment = new EsewaPayment(
+            var payment = new NativeEsewaPayment(
                 Intent.GetStringExtra(ExtraAmount)!,
                 Intent.GetStringExtra(ExtraProductName)!,
                 Intent.GetStringExtra(ExtraProductId)!,

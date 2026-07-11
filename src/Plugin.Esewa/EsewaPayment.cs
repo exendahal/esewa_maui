@@ -1,9 +1,10 @@
 namespace Plugin.Esewa;
 
 /// <summary>
-/// Locator for the platform implementation of <see cref="IEsewaPayment"/>.
+/// Entry point for launching an eSewa payment. Resolve the shared instance from
+/// <see cref="Current"/>.
 /// </summary>
-public static class CrossEsewaPayment
+public static class EsewaPayment
 {
     static readonly Lazy<IEsewaPayment> Implementation =
         new(CreatePlatformImplementation, LazyThreadSafetyMode.PublicationOnly);

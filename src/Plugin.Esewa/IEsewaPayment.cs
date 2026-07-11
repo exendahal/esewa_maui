@@ -2,7 +2,7 @@ namespace Plugin.Esewa;
 
 /// <summary>
 /// Unified, cross-platform entry point for launching an eSewa payment.
-/// Resolve the shared instance from <see cref="CrossEsewaPayment.Current"/>.
+/// Resolve the shared instance from <see cref="EsewaPayment.Current"/>.
 /// </summary>
 public interface IEsewaPayment
 {

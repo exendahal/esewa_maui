@@ -5,7 +5,7 @@ Accept **eSewa** payments in your .NET MAUI app with a single, async call.
 exposes one cross-platform C# API.
 
 ```csharp
-var result = await CrossEsewaPayment.Current.PayAsync(new EsewaPaymentRequest
+var result = await EsewaPayment.Current.PayAsync(new EsewaPaymentRequest
 {
     ClientId    = "<your-merchant-client-id>",
     SecretKey   = "<your-merchant-secret>",
@@ -56,7 +56,7 @@ using Plugin.Esewa;
 
 async Task PayAsync()
 {
-    if (!CrossEsewaPayment.IsSupported)
+    if (!EsewaPayment.IsSupported)
         return; // Not running on Android or iOS.
 
     var request = new EsewaPaymentRequest
@@ -70,7 +70,7 @@ async Task PayAsync()
         Environment = EsewaEnvironment.Production,
     };
 
-    EsewaPaymentResult result = await CrossEsewaPayment.Current.PayAsync(request);
+    EsewaPaymentResult result = await EsewaPayment.Current.PayAsync(request);
 
     switch (result.Status)
     {
@@ -93,12 +93,12 @@ cancellation or decline — inspect `result.Status`.
 
 ## API
 
-### `CrossEsewaPayment`
+### `EsewaPayment`
 
 | Member | Description |
 | --- | --- |
-| `CrossEsewaPayment.Current` | The payment service for the current platform. |
-| `CrossEsewaPayment.IsSupported` | `true` on Android and iOS. |
+| `EsewaPayment.Current` | The payment service for the current platform. |
+| `EsewaPayment.IsSupported` | `true` on Android and iOS. |
 
 ### `EsewaPaymentRequest`
 
