@@ -33,7 +33,7 @@
   <!-- ==================== NuGet package metadata ==================== -->
   <PropertyGroup>
     <PackageId>esewa_maui</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>exendahal</Authors>
     <Company>Santosh Dahal</Company>
     <Product>esewa_maui</Product>
@@ -154,17 +154,58 @@
   <ItemGroup>
     <None Include="buildTransitive\esewa_maui.targets"
           Pack="true" PackagePath="buildTransitive\esewa_maui.targets" Visible="false" />
+  </ItemGroup>
 
-    <None Include="Native\EsewaSDK.xcframework\**"
-          Pack="true"
-          PackagePath="buildTransitive\EsewaSDK.xcframework\%(RecursiveDir)%(Filename)%(Extension)"
-          Visible="false" />
-
-    <None Include="Native\EsewaBridge.xcframework\**"
+  <!-- Resource files preserve structure via %(RecursiveDir) (correct for files
+       with a normal name). The extensionless framework binaries / CodeResources
+       are Excluded here and packed explicitly below — on Windows `*.*` matches
+       even extensionless files, and their %(RecursiveDir) metadata is corrupt. -->
+  <ItemGroup>
+    <None Include="Native\EsewaSDK.xcframework\**\*.*"
+          Exclude="Native\EsewaSDK.xcframework\**\EsewaSDK;Native\EsewaSDK.xcframework\**\CodeResources"
+          Pack="true" Visible="false"
+          PackagePath="buildTransitive\EsewaSDK.xcframework\%(RecursiveDir)%(Filename)%(Extension)" />
+    <None Include="Native\EsewaBridge.xcframework\**\*.*"
+          Exclude="Native\EsewaBridge.xcframework\**\EsewaBridge;Native\EsewaBridge.xcframework\**\CodeResources"
           Condition="Exists('Native\EsewaBridge.xcframework')"
-          Pack="true"
-          PackagePath="buildTransitive\EsewaBridge.xcframework\%(RecursiveDir)%(Filename)%(Extension)"
-          Visible="false" />
+          Pack="true" Visible="false"
+          PackagePath="buildTransitive\EsewaBridge.xcframework\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <!-- Extensionless files (the framework Mach-O binaries + code signature) must
+       be listed EXPLICITLY with a *directory* PackagePath (trailing separator).
+       NuGet treats a PackagePath whose final segment has no extension as a
+       rename target and doubles the path; giving it the containing directory
+       makes it place the file by name. This is what caused MT158 "file does
+       not exist" for the framework binaries. Guarded on Exists per slice. -->
+  <ItemGroup>
+    <!-- EsewaSDK (vendored, dynamic framework) -->
+    <None Include="Native\EsewaSDK.xcframework\ios-arm64\EsewaSDK.framework\EsewaSDK"
+          Condition="Exists('Native\EsewaSDK.xcframework\ios-arm64\EsewaSDK.framework\EsewaSDK')"
+          Pack="true" Visible="false"
+          PackagePath="buildTransitive\EsewaSDK.xcframework\ios-arm64\EsewaSDK.framework\" />
+    <None Include="Native\EsewaSDK.xcframework\ios-arm64_x86_64-simulator\EsewaSDK.framework\EsewaSDK"
+          Condition="Exists('Native\EsewaSDK.xcframework\ios-arm64_x86_64-simulator\EsewaSDK.framework\EsewaSDK')"
+          Pack="true" Visible="false"
+          PackagePath="buildTransitive\EsewaSDK.xcframework\ios-arm64_x86_64-simulator\EsewaSDK.framework\" />
+    <None Include="Native\EsewaSDK.xcframework\ios-arm64_x86_64-simulator\EsewaSDK.framework\_CodeSignature\CodeResources"
+          Condition="Exists('Native\EsewaSDK.xcframework\ios-arm64_x86_64-simulator\EsewaSDK.framework\_CodeSignature\CodeResources')"
+          Pack="true" Visible="false"
+          PackagePath="buildTransitive\EsewaSDK.xcframework\ios-arm64_x86_64-simulator\EsewaSDK.framework\_CodeSignature\" />
+
+    <!-- EsewaBridge (built on macOS by build-shim.sh: device + arm64 simulator) -->
+    <None Include="Native\EsewaBridge.xcframework\ios-arm64\EsewaBridge.framework\EsewaBridge"
+          Condition="Exists('Native\EsewaBridge.xcframework\ios-arm64\EsewaBridge.framework\EsewaBridge')"
+          Pack="true" Visible="false"
+          PackagePath="buildTransitive\EsewaBridge.xcframework\ios-arm64\EsewaBridge.framework\" />
+    <None Include="Native\EsewaBridge.xcframework\ios-arm64-simulator\EsewaBridge.framework\EsewaBridge"
+          Condition="Exists('Native\EsewaBridge.xcframework\ios-arm64-simulator\EsewaBridge.framework\EsewaBridge')"
+          Pack="true" Visible="false"
+          PackagePath="buildTransitive\EsewaBridge.xcframework\ios-arm64-simulator\EsewaBridge.framework\" />
+    <None Include="Native\EsewaBridge.xcframework\ios-arm64_x86_64-simulator\EsewaBridge.framework\EsewaBridge"
+          Condition="Exists('Native\EsewaBridge.xcframework\ios-arm64_x86_64-simulator\EsewaBridge.framework\EsewaBridge')"
+          Pack="true" Visible="false"
+          PackagePath="buildTransitive\EsewaBridge.xcframework\ios-arm64_x86_64-simulator\EsewaBridge.framework\" />
   </ItemGroup>
 
 </Project>
