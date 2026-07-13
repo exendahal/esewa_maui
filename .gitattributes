@@ -1,0 +1,2 @@
+# Shell scripts must use LF so they run on the macOS CI runner.
+*.sh text eol=lf

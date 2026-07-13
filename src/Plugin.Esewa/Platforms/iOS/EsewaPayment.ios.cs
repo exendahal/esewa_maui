@@ -1,3 +1,4 @@
+using CoreText;
 using Foundation;
 using Microsoft.Maui.ApplicationModel;
 using Plugin.Esewa.Binding;
@@ -53,6 +54,12 @@ sealed class EsewaPaymentImplementation : IEsewaPayment
         {
             try
             {
+                // The SDK renders its UI with bundled Asap / SourceSansPro fonts.
+                // iOS only auto-registers UIAppFonts from the main app bundle, not
+                // from an embedded framework, so we register the framework's fonts
+                // ourselves — otherwise the SDK fatal-errors when a font is missing.
+                EnsureFontsRegistered();
+
                 bridge.InitiatePayment(
                     viewController,
                     environment,
@@ -73,6 +80,35 @@ sealed class EsewaPaymentImplementation : IEsewaPayment
         });
 
         return tcs.Task;
+    }
+
+    static int _fontsRegistered;
+
+    /// <summary>
+    /// Registers the fonts bundled inside EsewaSDK.framework with the process,
+    /// once. The framework declares them in its own Info.plist UIAppFonts, but
+    /// iOS only honors that for the main app bundle — hence explicit registration.
+    /// </summary>
+    static void EnsureFontsRegistered()
+    {
+        if (Interlocked.Exchange(ref _fontsRegistered, 1) == 1)
+            return;
+
+        try
+        {
+            // The framework's CFBundleIdentifier (from its Info.plist).
+            var bundle = NSBundle.FromIdentifier("com.esewa.EsewaSDK");
+            var urls = bundle?.GetUrlsForResourcesWithExtension("ttf", null);
+            if (urls is null)
+                return;
+
+            foreach (var url in urls)
+                CTFontManager.RegisterFontsForUrl(url, CTFontManagerScope.Process);
+        }
+        catch
+        {
+            // Best effort — if registration fails the SDK will surface its own error.
+        }
     }
 
     /// <summary>Bridges the native <c>EsewaSDKPaymentDelegate</c> callbacks to a Task.</summary>
