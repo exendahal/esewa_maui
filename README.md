@@ -22,7 +22,13 @@ if (result.IsSuccess)
 
 ## Preview
 
-<img src="preview/android.png" alt="esewa_maui payment screen on Android" width="280" />
+<table>
+  <tr>
+    <td align="center"><img src="preview/android.png" alt="esewa_maui payment screen on Android" width="260" /><br/>Android</td>
+    <td width="40"></td>
+    <td align="center"><img src="preview/ios.png" alt="esewa_maui payment screen on iOS" width="260" /><br/>iOS</td>
+  </tr>
+</table>
 
 ## Requirements
 
