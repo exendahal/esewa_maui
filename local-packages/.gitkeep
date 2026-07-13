@@ -1,0 +1,2 @@
+# Drop test .nupkg files here (e.g. the CI PR artifact).
+# This folder is registered as a NuGet source in ../nuget.config.
