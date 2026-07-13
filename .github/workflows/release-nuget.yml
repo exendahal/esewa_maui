@@ -15,6 +15,12 @@ jobs:
     # on Windows would silently ship a package whose iOS payment API cannot link.
     runs-on: macos-latest
 
+    # Trusted Publishing (OIDC) — no stored API key. `id-token: write` lets the
+    # NuGet/login action exchange a GitHub OIDC token for a short-lived key.
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
       - uses: actions/checkout@v4
 
@@ -50,5 +56,14 @@ jobs:
           /p:Version=${{ steps.get_version.outputs.version }}
           --output .
 
+      # Trusted Publishing: exchanges the GitHub OIDC token for a short-lived
+      # NuGet API key. Requires a matching trusted-publisher policy on nuget.org
+      # (account → Trusted Publishing) for this repo + workflow.
+      - name: NuGet login (Trusted Publishing)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
       - name: Push
-        run: dotnet nuget push "*.nupkg" -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+        run: dotnet nuget push "*.nupkg" -s https://api.nuget.org/v3/index.json -k ${{ steps.login.outputs.NUGET_API_KEY }} --skip-duplicate
