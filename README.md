@@ -79,6 +79,8 @@ if (result.IsSuccess)
 <table>
   <tr>
     <td align="center"><img src="preview/android_epay.png" alt="eSewa ePay v2 web checkout on Android" width="240" /><br/>Android</td>
+    <td width="32"></td>
+    <td align="center"><img src="preview/ios_epay.png" alt="eSewa ePay v2 web checkout on iOS" width="240" /><br/>iOS</td>
   </tr>
 </table>
 
