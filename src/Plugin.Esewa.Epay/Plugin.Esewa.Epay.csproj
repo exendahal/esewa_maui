@@ -41,6 +41,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>Initial release: eSewa ePay v2 hosted checkout (WebView) for Android and iOS.</PackageReleaseNotes>
 
@@ -52,6 +53,8 @@
 
   <ItemGroup>
     <None Include="NUGET.md" Pack="true" PackagePath="README.md" Visible="false" />
+    <!-- Reuse the same package icon as the native esewa_maui package. -->
+    <None Include="..\Plugin.Esewa\icon.png" Pack="true" PackagePath="\" Visible="false" />
   </ItemGroup>
 
 </Project>
