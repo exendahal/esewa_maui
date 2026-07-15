@@ -1,0 +1,61 @@
+name: Create a (Pre)release on NuGet (ePay)
+
+# Publishes the esewa_maui.epay (ePay v2) package. Uses a distinct "epay_" tag
+# prefix so it doesn't collide with the native esewa_maui release tags.
+on:
+  push:
+    tags:
+      - "epay_[0-9]+.[0-9]+.[0-9]+"
+      - "epay_[0-9]+.[0-9]+.[0-9]+-beta"
+      - "epay_[0-9]+.[0-9]+.[0-9]+-beta[0-9]+"
+      - "epay_[0-9]+.[0-9]+.[0-9]+-preview[0-9]+"
+
+jobs:
+  release-nuget-epay:
+    # Pure C# — a Windows runner builds and packs both the Android and iOS TFMs.
+    runs-on: windows-latest
+
+    # Trusted Publishing (OIDC) — no stored API key.
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install MAUI workloads
+        run: dotnet workload install maui
+
+      - name: Verify commit exists in origin/main or origin/develop
+        shell: pwsh
+        run: |
+          git fetch --no-tags --prune origin +refs/heads/*:refs/remotes/origin/*
+          $branches = git branch --remote --contains
+          if (-not ($branches | Select-String -Pattern 'origin/main|origin/develop')) {
+            Write-Error "Tagged commit is not contained in origin/main or origin/develop"
+            exit 1
+          }
+
+      - name: Get version information from tag
+        id: get_version
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}" -replace '^epay_', ''
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Pack
+        run: dotnet pack src/Plugin.Esewa.Epay/Plugin.Esewa.Epay.csproj -c Release /p:Version=${{ steps.get_version.outputs.version }} --output .
+
+      - name: NuGet login (Trusted Publishing)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push
+        run: dotnet nuget push "*.nupkg" -s https://api.nuget.org/v3/index.json -k ${{ steps.login.outputs.NUGET_API_KEY }} --skip-duplicate

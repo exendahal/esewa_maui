@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net10.0-android;net10.0-ios</TargetFrameworks>
+    <SupportedOSPlatformVersion Condition="$(TargetFramework.Contains('-android'))">24.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$(TargetFramework.Contains('-ios'))">13.0</SupportedOSPlatformVersion>
+
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Plugin.Esewa.Epay</RootNamespace>
+    <AssemblyName>Plugin.Esewa.Epay</AssemblyName>
+
+    <!-- A MAUI class library: brings in Microsoft.Maui.Controls so we can host
+         the hosted-checkout WebView on a modal page. No native SDK, no bindings. -->
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <!-- ==================== NuGet package metadata ==================== -->
+  <PropertyGroup>
+    <PackageId>esewa_maui.epay</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>exendahal</Authors>
+    <Company>Santosh Dahal</Company>
+    <Product>esewa_maui.epay</Product>
+    <Title>esewa_maui.epay — eSewa ePay v2 for .NET MAUI</Title>
+    <Description>
+      A lightweight, pure C# .NET MAUI library for accepting eSewa payments via
+      the current eSewa ePay v2 hosted checkout (HMAC-signed). No native SDK
+      binding — it opens the hosted eSewa payment page in a WebView, verifies
+      the signed response, and returns a normalized result through a single
+      cross-platform API: EsewaEpay.Current.PayAsync(...).
+    </Description>
+    <PackageTags>esewa;epay;maui;dotnet-maui;payment;payments;android;ios;nepal;fintech;web</PackageTags>
+    <Copyright>Santosh Dahal</Copyright>
+    <PackageProjectUrl>https://github.com/exendahal/esewa_maui</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/exendahal/esewa_maui</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>Initial release: eSewa ePay v2 hosted checkout (WebView) for Android and iOS.</PackageReleaseNotes>
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="NUGET.md" Pack="true" PackagePath="README.md" Visible="false" />
+  </ItemGroup>
+
+</Project>

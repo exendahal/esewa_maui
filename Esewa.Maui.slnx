@@ -3,6 +3,7 @@
     <Project Path="samples/EsewaSample/EsewaSample.csproj" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/Plugin.Esewa.Epay/Plugin.Esewa.Epay.csproj" />
     <Project Path="src/Plugin.Esewa/Plugin.Esewa.csproj" />
   </Folder>
 </Solution>

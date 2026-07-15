@@ -1,0 +1,44 @@
+name: Package ePay (PR artifact)
+
+# Builds the esewa_maui.epay (ePay v2) package on every PR to develop and
+# uploads it as a workflow artifact — nothing is published to nuget.org.
+on:
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  package-epay:
+    # Pure C# — Windows builds/packs both TFMs, no macOS/Xcode needed.
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install MAUI workloads
+        run: dotnet workload install maui
+
+      # Unique prerelease version per run, so it never collides with a published
+      # or stale-cached version.
+      - name: Compute version
+        id: ver
+        shell: pwsh
+        run: |
+          $base = (Select-String -Path src/Plugin.Esewa.Epay/Plugin.Esewa.Epay.csproj -Pattern '<Version>(.*?)</Version>').Matches[0].Groups[1].Value
+          "version=$base-ci.${{ github.run_number }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Pack
+        run: dotnet pack src/Plugin.Esewa.Epay/Plugin.Esewa.Epay.csproj -c Release /p:Version=${{ steps.ver.outputs.version }} --output ./artifacts
+
+      - name: Upload NuGet package
+        uses: actions/upload-artifact@v4
+        with:
+          name: esewa_maui.epay-nupkg-${{ steps.ver.outputs.version }}
+          path: artifacts/*.nupkg
+          if-no-files-found: error

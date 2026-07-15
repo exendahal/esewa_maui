@@ -72,6 +72,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\Plugin.Esewa\Plugin.Esewa.csproj" />
+		<ProjectReference Include="..\..\src\Plugin.Esewa.Epay\Plugin.Esewa.Epay.csproj" />
 	</ItemGroup>
 
 </Project>

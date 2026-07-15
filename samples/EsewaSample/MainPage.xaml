@@ -11,7 +11,7 @@
                    Style="{StaticResource Headline}"
                    SemanticProperties.HeadingLevel="Level1" />
 
-            <Label Text="Fill in the payment details and tap Pay to launch the native eSewa SDK."
+            <Label Text="Fill in the details, then pay via the native eSewa SDK or the ePay v2 web checkout."
                    Style="{StaticResource SubHeadline}" />
 
             <Entry x:Name="AmountEntry" Placeholder="Amount (e.g. 100)" Text="100" Keyboard="Numeric" />
@@ -19,8 +19,13 @@
             <Entry x:Name="ProductIdEntry" Placeholder="Product / transaction id" Text="TXN-001" />
 
             <Button x:Name="PayButton"
-                    Text="Pay with eSewa"
+                    Text="Pay with eSewa (Native SDK)"
                     Clicked="OnPayClicked"
+                    HorizontalOptions="Fill" />
+
+            <Button x:Name="EpayButton"
+                    Text="Pay with eSewa (ePay v2 / Web)"
+                    Clicked="OnPayEpayClicked"
                     HorizontalOptions="Fill" />
 
             <ActivityIndicator x:Name="Busy" IsRunning="False" IsVisible="False" />

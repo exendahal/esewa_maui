@@ -1,20 +1,25 @@
 using Plugin.Esewa;
+using Plugin.Esewa.Epay;
 
 namespace EsewaSample;
 
 public partial class MainPage : ContentPage
 {
-    // Demo test-environment merchant credentials from eSewa's ePay sandbox.
-    // Replace with your own merchant client id / secret for production.
+    // --- Native SDK (ePay) test credentials ---
     const string TestClientId = "JB0BBQ4aD0UqIThFJwAKBgAXEUkEGQUBBAwdOgABHD4DChwUAB0R";
     const string TestSecretKey = "BhwIWQQADhIYSxILExMcAgFXFhcOBwAKBgAXEQ==";
     const string CallbackUrl = "https://developer.esewa.com.np";
+
+    // --- ePay v2 (web checkout) sandbox test credentials ---
+    const string EpayProductCode = "EPAYTEST";
+    const string EpaySecretKey = "8gBm/:&EnhH.1/q";
 
     public MainPage()
     {
         InitializeComponent();
     }
 
+    // Native eSewa SDK (Android AAR / iOS xcframework).
     async void OnPayClicked(object? sender, EventArgs e)
     {
         if (!EsewaPayment.IsSupported)
@@ -24,8 +29,6 @@ public partial class MainPage : ContentPage
         }
 
         SetBusy(true);
-        ResultFrame.IsVisible = false;
-
         try
         {
             var request = new EsewaPaymentRequest
@@ -39,18 +42,22 @@ public partial class MainPage : ContentPage
                 Environment = EsewaEnvironment.Test,
             };
 
-            // The one call the whole plugin exists for:
             EsewaPaymentResult result = await EsewaPayment.Current.PayAsync(request);
 
-            ShowResult(result);
+            Render(
+                result.Status.ToString(),
+                result.Status switch
+                {
+                    EsewaPaymentStatus.Success => Colors.Green,
+                    EsewaPaymentStatus.Cancelled => Colors.Orange,
+                    _ => Colors.Red,
+                },
+                result.Message,
+                result.Details);
         }
         catch (Exception ex)
         {
-            ResultStatus.Text = "Error";
-            ResultStatus.TextColor = Colors.Red;
-            ResultMessage.Text = ex.Message;
-            ResultDetails.Text = string.Empty;
-            ResultFrame.IsVisible = true;
+            RenderError(ex);
         }
         finally
         {
@@ -58,26 +65,77 @@ public partial class MainPage : ContentPage
         }
     }
 
-    void ShowResult(EsewaPaymentResult result)
+    // eSewa ePay v2 web checkout (pure C#, hosted page in a WebView).
+    async void OnPayEpayClicked(object? sender, EventArgs e)
     {
-        ResultStatus.Text = result.Status.ToString();
-        ResultStatus.TextColor = result.Status switch
+        if (!EsewaEpay.IsSupported)
         {
-            EsewaPaymentStatus.Success => Colors.Green,
-            EsewaPaymentStatus.Cancelled => Colors.Orange,
-            _ => Colors.Red,
-        };
-        ResultMessage.Text = result.Message ?? string.Empty;
-        ResultDetails.Text = result.Details is { Count: > 0 }
-            ? string.Join("\n", result.Details.Select(kvp => $"{kvp.Key}: {kvp.Value}"))
+            await DisplayAlertAsync("Unsupported", "eSewa ePay is only available on Android and iOS.", "OK");
+            return;
+        }
+
+        SetBusy(true);
+        try
+        {
+            var request = new EsewaEpayRequest
+            {
+                Amount = decimal.TryParse(AmountEntry.Text, out var a) ? a : 100m,
+                ProductCode = EpayProductCode,
+                SecretKey = EpaySecretKey,
+                Environment = EsewaEpayEnvironment.Sandbox,
+            };
+
+            EsewaEpayResult result = await EsewaEpay.Current.PayAsync(request);
+
+            Render(
+                result.Status.ToString(),
+                result.Status switch
+                {
+                    EsewaEpayStatus.Complete => Colors.Green,
+                    EsewaEpayStatus.Cancelled => Colors.Orange,
+                    EsewaEpayStatus.Pending => Colors.Goldenrod,
+                    _ => Colors.Red,
+                },
+                result.TransactionCode is { Length: > 0 } ? $"{result.Message}  (ref: {result.TransactionCode})" : result.Message,
+                result.Details);
+        }
+        catch (Exception ex)
+        {
+            RenderError(ex);
+        }
+        finally
+        {
+            SetBusy(false);
+        }
+    }
+
+    void Render(string status, Color color, string? message, IReadOnlyDictionary<string, string>? details)
+    {
+        ResultStatus.Text = status;
+        ResultStatus.TextColor = color;
+        ResultMessage.Text = message ?? string.Empty;
+        ResultDetails.Text = details is { Count: > 0 }
+            ? string.Join("\n", details.Select(kvp => $"{kvp.Key}: {kvp.Value}"))
             : string.Empty;
+        ResultFrame.IsVisible = true;
+    }
+
+    void RenderError(Exception ex)
+    {
+        ResultStatus.Text = "Error";
+        ResultStatus.TextColor = Colors.Red;
+        ResultMessage.Text = ex.Message;
+        ResultDetails.Text = string.Empty;
         ResultFrame.IsVisible = true;
     }
 
     void SetBusy(bool busy)
     {
+        if (busy)
+            ResultFrame.IsVisible = false;
         Busy.IsRunning = busy;
         Busy.IsVisible = busy;
         PayButton.IsEnabled = !busy;
+        EpayButton.IsEnabled = !busy;
     }
 }
